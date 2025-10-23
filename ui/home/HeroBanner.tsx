@@ -11,32 +11,18 @@ import SearchBarMobile from 'ui/snippets/searchBar/SearchBarMobile';
 import UserProfileDesktop from 'ui/snippets/user/profile/UserProfileDesktop';
 import UserWalletDesktop from 'ui/snippets/user/wallet/UserWalletDesktop';
 
-export const BACKGROUND_DEFAULT =
-  'radial-gradient(103.03% 103.03% at 0% 0%, rgba(183, 148, 244, 0.8) 0%, rgba(0, 163, 196, 0.8) 100%), var(--chakra-colors-blue-400)';
-const TEXT_COLOR_DEFAULT = 'white';
+export const BACKGROUND_DEFAULT = 'transparent';
 const BORDER_DEFAULT = 'none';
 
 const HeroBanner = () => {
-  const background = {
+  const gradient = {
     _light:
       config.UI.homepage.heroBanner?.background?.[0] ||
-      BACKGROUND_DEFAULT,
+      'radial-gradient(ellipse 100% 285% at 100% 100%, rgba(224, 254, 109, 0.30) 0%, rgba(153, 243, 163, 0.30) 28%, transparent 100%)',
     _dark:
       config.UI.homepage.heroBanner?.background?.[1] ||
       config.UI.homepage.heroBanner?.background?.[0] ||
-      BACKGROUND_DEFAULT,
-  };
-
-  const textColor = {
-    _light:
-      // light mode
-      config.UI.homepage.heroBanner?.text_color?.[0] ||
-      TEXT_COLOR_DEFAULT,
-    // dark mode
-    _dark:
-      config.UI.homepage.heroBanner?.text_color?.[1] ||
-      config.UI.homepage.heroBanner?.text_color?.[0] ||
-      TEXT_COLOR_DEFAULT,
+      'radial-gradient(ellipse 100% 285% at 100% 100%, rgba(224, 254, 109, 0.15) 0%, rgba(153, 243, 163, 0.15) 28%, transparent 100%)',
   };
 
   const border = {
@@ -49,7 +35,8 @@ const HeroBanner = () => {
   return (
     <Flex
       w="100%"
-      background={ background }
+      bgImage={ gradient }
+      bg="whiteAlpha.50"
       border={ border }
       borderRadius="md"
       p={{ base: 4, lg: 8 }}
@@ -63,13 +50,10 @@ const HeroBanner = () => {
             fontSize={{ base: '18px', lg: '30px' }}
             lineHeight={{ base: '24px', lg: '36px' }}
             fontWeight={{ base: 500, lg: 700 }}
-            color={ textColor }
+            bgImage="linear-gradient(to right, #f7732d, #f07823 43.75%, #ffa217 84.615%)"
+            bgClip="text"
           >
-            {
-              config.meta.seo.enhancedDataEnabled ?
-                `${ config.chain.name } blockchain explorer` :
-                `${ config.chain.name } explorer`
-            }
+            Citrea Testnet explorer
           </Heading>
           { config.UI.navigation.layout === 'vertical' && (
             <Box display={{ base: 'none', lg: 'flex' }} gap={ 2 }>

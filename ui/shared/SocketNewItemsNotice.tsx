@@ -85,6 +85,12 @@ const SocketNewItemsNotice = chakra(({ children, className, url, num, showErrorA
       px={ 4 }
       py="6px"
       fontSize="sm"
+      // Add gradient background for "scanning" state as per Figma
+      bgGradient={ !showErrorAlert && !num ? 'to-r' : undefined }
+      gradientFrom={ !showErrorAlert && !num ? '#ff860c' : undefined }
+      gradientTo={ !showErrorAlert && !num ? '#ffdd87' : undefined }
+      color={ !showErrorAlert && !num ? 'white' : undefined }
+      fontWeight={ !showErrorAlert && !num ? 'medium' : undefined }
     >
       { alertContent }
     </Alert>

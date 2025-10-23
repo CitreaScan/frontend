@@ -30,7 +30,7 @@ const LogoFallback = ({ isCollapsed, isSmall }: { isCollapsed?: boolean; isSmall
       name={ isSmall ? 'networks/icon-placeholder' : 'networks/logo-placeholder' }
       width={ isSmall ? '30px' : '120px' }
       height="100%"
-      color={{ base: 'blue.600', _dark: 'white' }}
+      color={{ base: 'orange.600', _dark: 'white' }}
       display={ display }
       aria-label={ isSmall ? 'Network icon placeholder' : 'Network logo placeholder' }
     />
@@ -41,8 +41,8 @@ const INVERT_FILTER = 'brightness(0) invert(1)';
 
 const NetworkLogo = ({ isCollapsed, onClick, className }: Props) => {
 
-  const logoSrc = useColorModeValue(config.UI.navigation.logo.default, config.UI.navigation.logo.dark || config.UI.navigation.logo.default);
-  const iconSrc = useColorModeValue(config.UI.navigation.icon.default, config.UI.navigation.icon.dark || config.UI.navigation.icon.default);
+  const logoSrc = useColorModeValue('/assets/citrea-logo.svg', '/assets/citrea-logo.svg');
+  const iconSrc = useColorModeValue('/assets/citrea-icon.svg', '/assets/citrea-icon.svg');
 
   return (
     <chakra.a

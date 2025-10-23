@@ -59,8 +59,8 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
     // ELEMENTS
     address: {
       highlighted: {
-        bg: { value: { _light: '{colors.blue.50}', _dark: '{colors.blue.900}' } },
-        border: { value: { _light: '{colors.blue.200}', _dark: '{colors.blue.600}' } },
+        bg: { value: { _light: '{colors.orange.50}', _dark: '{colors.orange.900}' } },
+        border: { value: { _light: '{colors.orange.300}', _dark: '{colors.orange.600}' } },
       },
     },
 
@@ -135,8 +135,8 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
           },
           selected: {
             value: {
-              _light: heroBannerButton?._selected?.background?.[0] || '{colors.blue.50}',
-              _dark: heroBannerButton?._selected?.background?.[1] || heroBannerButton?._selected?.background?.[0] || '{colors.blue.50}',
+              _light: heroBannerButton?._selected?.background?.[0] || '{colors.orange.50}',
+              _dark: heroBannerButton?._selected?.background?.[1] || heroBannerButton?._selected?.background?.[0] || '{colors.orange.50}',
             },
           },
         },
@@ -169,6 +169,10 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
     },
     link: {
       primary: {
+        DEFAULT: { value: { _light: '{colors.blackAlpha.800}', _dark: '{colors.whiteAlpha.800}' } },
+        hover: { value: { _light: '{colors.blackAlpha.600}', _dark: '{colors.whiteAlpha.600}' } },
+      },
+      accent: {
         DEFAULT: { value: { _light: '{colors.theme.link.primary._light}', _dark: '{colors.theme.link.primary._dark}' } },
         hover: { value: '{colors.hover}' },
       },
@@ -254,7 +258,7 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
       },
       bg: {
         info: { value: { _light: '{colors.blackAlpha.50}', _dark: '{colors.whiteAlpha.100}' } },
-        warning: { value: { _light: '{colors.orange.100}', _dark: '{colors.orange.800/44}' } },
+        warning: { value: { _light: 'rgba(0, 0, 0, 0.03)', _dark: '{colors.orange.800/44}' } },
         warning_table: { value: { _light: '{colors.orange.50}', _dark: '{colors.orange.800/44}' } },
         success: { value: { _light: '{colors.green.100}', _dark: '{colors.green.900}' } },
         error: { value: { _light: '{colors.red.100}', _dark: '{colors.red.900}' } },
@@ -266,11 +270,11 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
       },
       bg: {
         DEFAULT: { value: '{colors.alert.bg.info}' },
-        info: { value: { _light: '{colors.blue.100}', _dark: '{colors.blue.900}' } },
+        info: { value: { _light: '{colors.orange.100}', _dark: '{colors.orange.900}' } },
         warning: { value: '{colors.alert.bg.warning}' },
         success: { value: '{colors.alert.bg.success}' },
         error: { value: '{colors.alert.bg.error}' },
-        loading: { value: { _light: '{colors.blue.100}', _dark: '{colors.blue.900}' } },
+        loading: { value: { _light: '{colors.orange.100}', _dark: '{colors.orange.900}' } },
       },
     },
     input: {
@@ -371,6 +375,11 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
         bg: { value: { _light: '{colors.blue.50}', _dark: '{colors.blue.800}' } },
         fg: { value: { _light: '{colors.blackAlpha.800}', _dark: '{colors.whiteAlpha.800}' } },
       },
+      // Add Citrea orange badge variant for transaction types
+      citrea_orange: {
+        bg: { value: { _light: '{colors.orange.50}', _dark: '{colors.orange.800}' } },
+        fg: { value: { _light: '{colors.orange.500}', _dark: '{colors.orange.200}' } },
+      },
       yellow: {
         bg: { value: { _light: '{colors.yellow.50}', _dark: '{colors.yellow.800}' } },
         fg: { value: { _light: '{colors.yellow.500}', _dark: '{colors.yellow.100}' } },
@@ -395,7 +404,7 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
           fg: { value: { _light: '{colors.blackAlpha.800}', _dark: '{colors.whiteAlpha.800}' } },
         },
         filter: {
-          bg: { value: { _light: '{colors.blue.50}', _dark: '{colors.whiteAlpha.200}' } },
+          bg: { value: { _light: '{colors.orange.50}', _dark: '{colors.whiteAlpha.200}' } },
         },
         select: {
           bg: {

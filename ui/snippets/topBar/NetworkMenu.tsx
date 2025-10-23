@@ -41,8 +41,10 @@ const NetworkMenu = () => {
               borderRadius="sm"
               onClick={ menu.onToggle }
               p={ 0.5 }
+              color="white"
+              _hover={{ color: 'whiteAlpha.800' }}
             >
-              <IconSvg name="networks" boxSize="full"/>
+              <IconSvg name="networks" boxSize="full" color="currentColor"/>
             </IconButton>
           </PopoverTrigger>
         </Flex>
