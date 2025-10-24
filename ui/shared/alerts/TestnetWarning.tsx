@@ -19,7 +19,7 @@ const TestnetWarning = ({ isLoading, className }: Props) => {
       status="warning"
       loading={ isLoading }
       className={ className }
-      bg="gray.500"
+      bg="orange.500"
       color="white"
     >
       This is a testnet transaction only
