@@ -37,6 +37,7 @@ const TxDetailsSetMaxGasLimit = ({ data }: Props) => {
           flexWrap="wrap"
           mr={ 3 }
           rowGap={ 0 }
+          accuracyUsd={ 2 }
         />
       </DetailedInfo.ItemValue>
       <TxDetailsGasUsage data={ data }/>

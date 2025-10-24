@@ -29,6 +29,7 @@ const TxDetailsTxFee = ({ isLoading, data }: Props) => {
           isLoading={ isLoading }
           withUsd
           rowGap={ 0 }
+          accuracyUsd={ 2 }
         />
       );
     }
@@ -47,6 +48,7 @@ const TxDetailsTxFee = ({ isLoading, data }: Props) => {
           flexWrap="wrap"
           mr={ 3 }
           rowGap={ 0 }
+          accuracyUsd={ 2 }
         />
         <DetailedInfoItemBreakdown.Container loading={ isLoading }>
           <DetailedInfoItemBreakdown.Row
@@ -61,6 +63,7 @@ const TxDetailsTxFee = ({ isLoading, data }: Props) => {
               showGweiTooltip
               flexWrap="wrap"
               rowGap={ 0 }
+              accuracyUsd={ 2 }
             />
           </DetailedInfoItemBreakdown.Row>
           <DetailedInfoItemBreakdown.Row
@@ -75,6 +78,7 @@ const TxDetailsTxFee = ({ isLoading, data }: Props) => {
               showGweiTooltip
               flexWrap="wrap"
               rowGap={ 0 }
+              accuracyUsd={ 2 }
             />
           </DetailedInfoItemBreakdown.Row>
         </DetailedInfoItemBreakdown.Container>
