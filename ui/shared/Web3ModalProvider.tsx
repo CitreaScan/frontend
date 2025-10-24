@@ -41,7 +41,7 @@ const init = () => {
       },
       themeVariables: {
         '--w3m-font-family': `${ BODY_TYPEFACE }, sans-serif`,
-        '--w3m-accent': colors.blue[600].value,
+        '--w3m-accent': colors.orange[500].value,
         '--w3m-border-radius-master': '2px',
         '--w3m-z-index': zIndex?.modal2?.value,
       },

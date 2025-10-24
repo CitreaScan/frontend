@@ -135,8 +135,8 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
           },
           selected: {
             value: {
-              _light: heroBannerButton?._selected?.background?.[0] || '{colors.orange.50}',
-              _dark: heroBannerButton?._selected?.background?.[1] || heroBannerButton?._selected?.background?.[0] || '{colors.orange.50}',
+              _light: heroBannerButton?._selected?.background?.[0] || '{colors.blackAlpha.50}',
+              _dark: heroBannerButton?._selected?.background?.[1] || heroBannerButton?._selected?.background?.[0] || '{colors.whiteAlpha.100}',
             },
           },
         },
@@ -156,7 +156,7 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
           selected: {
             value: {
               _light: heroBannerButton?._selected?.text_color?.[0] || '{colors.blackAlpha.800}',
-              _dark: heroBannerButton?._selected?.text_color?.[1] || heroBannerButton?._selected?.text_color?.[0] || '{colors.blackAlpha.800}',
+              _dark: heroBannerButton?._selected?.text_color?.[1] || heroBannerButton?._selected?.text_color?.[0] || '{colors.whiteAlpha.800}',
             },
           },
         },
