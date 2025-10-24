@@ -66,14 +66,14 @@ const SocketNewItemsNotice = chakra(({ children, className, url, num, showErrorA
 
     if (type === 'cross_chain_transaction') {
       return (
-        <Link href={ url } onClick={ !url ? handleLinkClick : undefined }>More { name }s available</Link>
+        <Link href={ url } onClick={ !url ? handleLinkClick : undefined } color="white">More { name }s available</Link>
       );
     }
 
     return (
       <>
-        <Link href={ url } onClick={ !url ? handleLinkClick : undefined }>{ num.toLocaleString() } more { name }{ num > 1 ? 's' : '' }</Link>
-        <Text whiteSpace="pre"> ha{ num > 1 ? 've' : 's' } come in</Text>
+        <Link href={ url } onClick={ !url ? handleLinkClick : undefined } color="white">{ num.toLocaleString() } more { name }{ num > 1 ? 's' : '' }</Link>
+        <Text whiteSpace="pre" color="white"> ha{ num > 1 ? 've' : 's' } come in</Text>
       </>
     );
   })();
@@ -86,11 +86,11 @@ const SocketNewItemsNotice = chakra(({ children, className, url, num, showErrorA
       py="6px"
       fontSize="sm"
       // Add gradient background for "scanning" state as per Figma
-      bgGradient={ !showErrorAlert && !num ? 'to-r' : undefined }
-      gradientFrom={ !showErrorAlert && !num ? '#ff860c' : undefined }
-      gradientTo={ !showErrorAlert && !num ? '#ffdd87' : undefined }
-      color={ !showErrorAlert && !num ? 'white' : undefined }
-      fontWeight={ !showErrorAlert && !num ? 'medium' : undefined }
+      bgGradient={ !showErrorAlert ? 'to-r' : undefined }
+      gradientFrom={ !showErrorAlert ? '#ff860c' : undefined }
+      gradientTo={ !showErrorAlert ? '#ffdd87af' : undefined }
+      color="white"
+      fontWeight="medium"
     >
       { alertContent }
     </Alert>

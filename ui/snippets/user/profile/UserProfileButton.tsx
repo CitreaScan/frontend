@@ -89,6 +89,10 @@ const UserProfileButton = ({ profileQuery, size, variant, onClick, isPending, ..
           fontWeight={ dataExists ? 700 : 600 }
           loading={ isButtonLoading }
           { ...rest }
+          _selected={{
+            bg: { _light: 'blackAlpha.100', _dark: 'whiteAlpha.100' },
+            color: 'button.header.fg.selected',
+          }}
         >
           { content }
         </Button>

@@ -34,7 +34,7 @@ export const Toaster = () => {
           return (
             <Toast.Root width={{ md: 'sm' }}>
               { toast.type === 'loading' ? (
-                <Spinner size="sm" color="blue.solid" my={ 1 }/>
+                <Spinner size="sm" color="orange.500" my={ 1 }/>
               ) : null }
               <Stack gap="0" flex="1" maxWidth="100%">
                 { toast.title && <Toast.Title>{ toast.title }</Toast.Title> }

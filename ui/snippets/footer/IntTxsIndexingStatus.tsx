@@ -73,7 +73,7 @@ const IntTxsIndexingStatus = () => {
       justifyContent="center"
       columnGap={ 1 }
       color="green.400"
-      _hover={{ color: 'blue.400' }}
+      _hover={{ color: 'orange.400' }}
     >
       <IconSvg name="info" boxSize={ 5 }/>
       { data.indexed_internal_transactions_ratio && (

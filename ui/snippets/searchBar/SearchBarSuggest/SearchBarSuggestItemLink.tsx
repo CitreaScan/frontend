@@ -22,7 +22,7 @@ const SearchBarSuggestItemLink = React.forwardRef<HTMLAnchorElement, Props>(({ c
         borderBottomWidth: '0',
       }}
       _hover={{
-        bgColor: { _light: 'blue.50', _dark: 'gray.800' },
+        bgColor: { _light: 'orange.50', _dark: 'gray.800' },
       }}
       textStyle="sm"
       _first={{
