@@ -7,8 +7,10 @@ on:
 
 env:
   DOCKER_TAGS: dfxswiss/citrea-frontend:beta
-  RESOURCE_GROUP: rg-dfx-api-dev
-  VM_NAME: vm-dfx-node-dev
+  AZURE_RESOURCE_GROUP: rg-dfx-api-dev
+  AZURE_VM_NAME: vm-dfx-node-dev
+  AZURE_FRONT_DOOR: 'afd-dfx-api-dev'
+  AZURE_FRONT_DOOR_ENDPOINT: 'fde-dfx-ctef-dev'
 
 jobs:
   build-and-deploy:
@@ -48,11 +50,29 @@ jobs:
           inlineScript: |
             echo "Update docker container..."
 
+            CONTENT=$(base64 -w0 ./config/envs/.env.vm_citrea_testnet)
+
             az vm run-command invoke \
-              --resource-group ${{ env.RESOURCE_GROUP }} \
-              --name ${{ env.VM_NAME }} \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --name ${{ env.AZURE_VM_NAME }} \
+              --command-id RunShellScript \
+              --script "echo $CONTENT | base64 -d > /home/dfx/update/docker-compose-blockscout-citrea-testnet.frontend.env"
+
+            az vm run-command invoke \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --name ${{ env.AZURE_VM_NAME }} \
               --command-id RunShellScript \
               --script "/home/dfx/update-citrea-frontend.sh"
+
+      - name: Purge CDN endpoint (DEV)
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az afd endpoint purge \
+              --content-paths "/*" \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --profile-name ${{ env.AZURE_FRONT_DOOR }} \
+              --endpoint-name ${{ env.AZURE_FRONT_DOOR_ENDPOINT }}
 
       - name: Logout from Azure
         run: |
