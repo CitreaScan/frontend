@@ -30,7 +30,7 @@ const GetGasButton = () => {
 
       return (
         <>
-          <Box h="1px" w="8px" bg="border.divider" mx={ 1 }/>
+          <Box h="1px" w="8px" bg="whiteAlpha.400" mx={ 1 }/>
           <Link
             href={ isInternal ? route({ pathname: '/apps/[id]', query: { id: dappId, url } }) : url }
             external={ !isInternal }
@@ -38,6 +38,8 @@ const GetGasButton = () => {
             alignItems="center"
             textStyle="xs"
             onClick={ onGetGasClick }
+            color="white"
+            _hover={{ color: 'whiteAlpha.800' }}
           >
             { getGasFeature.logoUrl && (
               <Image

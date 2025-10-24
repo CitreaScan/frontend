@@ -23,24 +23,24 @@ const DEFAULT_THEME_COLORS = {
     },
   },
   hover: {
-    _light: { value: '{colors.blue.400}' },
-    _dark: { value: '{colors.blue.400}' },
+    _light: { value: '{colors.orange.500}' },
+    _dark: { value: '{colors.orange.400}' },
   },
   selected: {
     control: {
       text: {
-        _light: { value: '{colors.blue.700}' },
+        _light: { value: '{colors.orange.700}' },
         _dark: { value: '{colors.gray.50}' },
       },
       bg: {
-        _light: { value: '{colors.blue.50}' },
+        _light: { value: '{colors.orange.50}' },
         _dark: { value: '{colors.whiteAlpha.100}' },
       },
     },
     option: {
       bg: {
-        _light: { value: '{colors.blue.500}' },
-        _dark: { value: '{colors.blue.500}' },
+        _light: { value: '{colors.orange.500}' },
+        _dark: { value: '{colors.orange.500}' },
       },
     },
   },
@@ -56,42 +56,42 @@ const DEFAULT_THEME_COLORS = {
   },
   button: {
     primary: {
-      _light: { value: '{colors.blue.600}' },
-      _dark: { value: '{colors.blue.600}' },
+      _light: { value: '{colors.orange.600}' },
+      _dark: { value: '{colors.orange.500}' },
     },
   },
   link: {
     primary: {
-      _light: { value: '{colors.blue.600}' },
-      _dark: { value: '{colors.blue.300}' },
+      _light: { value: '{colors.orange.600}' },
+      _dark: { value: '{colors.orange.400}' },
     },
   },
   graph: {
     line: {
-      _light: { value: '{colors.blue.500}' },
-      _dark: { value: '{colors.blue.200}' },
+      _light: { value: '{colors.orange.500}' },
+      _dark: { value: '{colors.orange.300}' },
     },
     gradient: {
       start: {
-        _light: { value: 'rgba(144, 205, 244, 0.3)' }, // blue.200 with opacity 0.3
-        _dark: { value: 'rgba(144, 205, 244, 0.3)' }, // blue.200 with opacity 0.3
+        _light: { value: 'rgba(255, 162, 23, 0.3)' },
+        _dark: { value: 'rgba(255, 162, 23, 0.3)' },
       },
       stop: {
-        _light: { value: 'rgba(144, 205, 244, 0)' }, // blue.200 with opacity 0
-        _dark: { value: 'rgba(144, 205, 244, 0)' }, // blue.200 with opacity 0
+        _light: { value: 'rgba(255, 162, 23, 0)' },
+        _dark: { value: 'rgba(255, 162, 23, 0)' },
       },
     },
   },
   navigation: {
     bg: {
       selected: {
-        _light: { value: '{colors.blue.50}' },
+        _light: { value: '{colors.orange.50}' },
         _dark: { value: '{colors.gray.800}' },
       },
     },
     text: {
       selected: {
-        _light: { value: '{colors.blue.700}' },
+        _light: { value: '{colors.orange.700}' },
         _dark: { value: '{colors.gray.50}' },
       },
     },
@@ -111,8 +111,8 @@ const DEFAULT_THEME_COLORS = {
   tabs: {
     text: {
       primary: {
-        _light: { value: '{colors.blue.700}' },
-        _dark: { value: '{colors.blue.100}' },
+        _light: { value: '{colors.orange.700}' },
+        _dark: { value: '{colors.orange.200}' },
       },
     },
   },
@@ -157,16 +157,16 @@ const colors = {
     '900': { value: '#63171B' },
   },
   orange: {
-    '50': { value: '#FFFAF0' },
+    '50': { value: '#FFF6EB' },
     '100': { value: '#FEEBCB' },
     '200': { value: '#FBD38D' },
-    '300': { value: '#F6AD55' },
-    '400': { value: '#ED8936' },
-    '500': { value: '#DD6B20' },
-    '600': { value: '#C05621' },
-    '700': { value: '#9C4221' },
-    '800': { value: '#7B341E' },
-    '900': { value: '#652B19' },
+    '300': { value: '#FFA217' },
+    '400': { value: '#F07823' },
+    '500': { value: '#F6741D' },
+    '600': { value: '#EA5729' },
+    '700': { value: '#F7732D' },
+    '800': { value: '#C54621' },
+    '900': { value: '#9C3819' },
   },
   yellow: {
     '50': { value: '#FFFFF0' },

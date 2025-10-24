@@ -43,8 +43,10 @@ const Settings = () => {
               size="2xs"
               borderRadius="sm"
               aria-label="User settings"
+              color="white"
+              _hover={{ color: 'whiteAlpha.800' }}
             >
-              <IconSvg name="gear_slim"/>
+              <IconSvg name="gear_slim" color="currentColor"/>
             </IconButton>
           </PopoverTrigger>
         </Flex>

@@ -13,10 +13,16 @@ async function generateFavicons() {
       throw new Error('FAVICON_MASTER_URL or NEXT_PUBLIC_NETWORK_ICON must be set');
     }
 
-    const fetch = await import('node-fetch');
-    const response = await fetch.default(masterUrl);
-    const buffer = await response.arrayBuffer();
-    const source = Buffer.from(buffer);
+    let source;
+    if (masterUrl.startsWith('http://') || masterUrl.startsWith('https://')) {
+      const fetch = await import('node-fetch');
+      const response = await fetch.default(masterUrl);
+      const buffer = await response.arrayBuffer();
+      source = Buffer.from(buffer);
+    } else {
+      // Read from local file
+      source = await fs.readFile(masterUrl);
+    }
 
     const configuration = {
       path: '/output',

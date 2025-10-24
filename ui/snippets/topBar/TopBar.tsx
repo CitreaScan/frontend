@@ -11,8 +11,15 @@ import TopBarStats from './TopBarStats';
 
 const TopBar = () => {
   return (
-    // not ideal if scrollbar is visible, but better than having a horizontal scroll
-    <Box bgColor={{ _light: 'theme.topbar.bg._light', _dark: 'theme.topbar.bg._dark' }} position="sticky" left={ 0 } width="100%" maxWidth="100vw">
+    // Citrea brand orange top banner
+    <Box
+      bgColor={{ _light: 'orange.600', _dark: 'orange.700' }}
+      position="sticky"
+      left={ 0 }
+      width="100%"
+      maxWidth="100vw"
+      color="white"
+    >
       <Flex
         py={ 2 }
         px={{ base: 3, lg: 6 }}
@@ -26,13 +33,13 @@ const TopBar = () => {
           { config.features.deFiDropdown.isEnabled && (
             <>
               <DeFiDropdown/>
-              <Separator mr={ 3 } ml={{ base: 2, sm: 3 }} height={ 4 } orientation="vertical"/>
+              <Separator mr={ 3 } ml={{ base: 2, sm: 3 }} height={ 4 } orientation="vertical" borderColor="whiteAlpha.400"/>
             </>
           ) }
           <Settings/>
           { Boolean(config.UI.featuredNetworks.items) && (
             <>
-              <Separator mx={ 3 } height={ 4 } orientation="vertical"/>
+              <Separator mx={ 3 } height={ 4 } orientation="vertical" borderColor="whiteAlpha.400"/>
               <NetworkMenu/>
             </>
           ) }

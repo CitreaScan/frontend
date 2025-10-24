@@ -37,12 +37,12 @@ const DeFiDropdown = () => {
   return items.length > 1 ? (
     <PopoverRoot>
       <PopoverTrigger>
-        <Button size="2xs" gap={ 0 }>
+        <Button size="2xs" gap={ 0 } color="white" borderColor="whiteAlpha.400" _hover={{ borderColor: 'white', bg: 'whiteAlpha.200' }}>
           <chakra.span display={{ base: 'none', lg: 'inline' }} whiteSpace="pre-wrap">
             Blockscout{ space }
           </chakra.span>
           DeFi
-          <IconSvg name="arrows/east-mini" boxSize={ 4 } ml={ 1 } transform="rotate(-90deg)"/>
+          <IconSvg name="arrows/east-mini" boxSize={ 4 } ml={ 1 } transform="rotate(-90deg)" color="currentColor"/>
         </Button>
       </PopoverTrigger>
       <PopoverContent w="auto">
@@ -65,8 +65,8 @@ const DeFiDropdown = () => {
       target={ items[0].dappId ? '_self' : '_blank' }
       asChild
     >
-      <Button onClick={ items[0].onClick } size="2xs">
-        <IconSvg name={ items[0].icon } boxSize={ 3 } mr={{ base: 0, sm: 1 }}/>
+      <Button onClick={ items[0].onClick } size="2xs" color="white" borderColor="whiteAlpha.400" _hover={{ borderColor: 'white', bg: 'whiteAlpha.200' }}>
+        <IconSvg name={ items[0].icon } boxSize={ 3 } mr={{ base: 0, sm: 1 }} color="currentColor"/>
         <Box display={{ base: 'none', sm: 'inline' }}>
           { items[0].text }
         </Box>
