@@ -89,8 +89,8 @@ const SocketNewItemsNotice = chakra(({ children, className, url, num, showErrorA
       bgGradient={ !showErrorAlert ? 'to-r' : undefined }
       gradientFrom={ !showErrorAlert ? '#ff860c' : undefined }
       gradientTo={ !showErrorAlert ? '#ffdd87af' : undefined }
-      color="white"
-      fontWeight="medium"
+      color={ !showErrorAlert ? 'white' : undefined }
+      fontWeight={ !showErrorAlert ? 'medium' : undefined }
     >
       { alertContent }
     </Alert>
