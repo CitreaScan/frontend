@@ -228,17 +228,15 @@ const Stats = () => {
 
   return (
     <Grid
-      gridTemplateColumns="1fr 1fr"
+      gridTemplateColumns={{ base: '1fr 1fr', lg: `repeat(${ items.length }, 1fr)` }}
       gridGap={{ base: 1, lg: 2 }}
-      flexBasis="50%"
-      flexGrow={ 1 }
+      width="100%"
     >
-      { items.map((item, index) => (
+      { items.map((item) => (
         <StatsWidget
           key={ item.id }
           { ...item }
-          isLoading={ isLoading }
-          _last={ items.length % 2 === 1 && index === items.length - 1 ? { gridColumn: 'span 2' } : undefined }/>
+          isLoading={ isLoading }/>
       ),
       ) }
     </Grid>
