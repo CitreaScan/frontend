@@ -37,12 +37,10 @@ const LogoFallback = ({ isCollapsed, isSmall }: { isCollapsed?: boolean; isSmall
   );
 };
 
-const INVERT_FILTER = 'brightness(0) invert(1)';
-
 const NetworkLogo = ({ isCollapsed, onClick, className }: Props) => {
 
-  const logoSrc = useColorModeValue('/assets/citrea-logo.svg', '/assets/citrea-logo.svg');
-  const iconSrc = useColorModeValue('/assets/citrea-icon.svg', '/assets/citrea-icon.svg');
+  const logoSrc = useColorModeValue('/assets/citrea-logo-light.svg', '/assets/citrea-logo-dark.svg');
+  const iconSrc = useColorModeValue('/assets/citrea-icon-light.svg', '/assets/citrea-icon-dark.svg');
 
   return (
     <chakra.a
@@ -64,7 +62,6 @@ const NetworkLogo = ({ isCollapsed, onClick, className }: Props) => {
         alt={ `${ config.chain.name } network logo` }
         fallback={ <LogoFallback isCollapsed={ isCollapsed }/> }
         display={{ base: 'block', lg: isCollapsed === false ? 'block' : 'none', xl: isCollapsed ? 'none' : 'block' }}
-        filter={{ _dark: !config.UI.navigation.logo.dark ? INVERT_FILTER : undefined }}
         objectFit="contain"
         objectPosition="left"
       />
@@ -76,7 +73,6 @@ const NetworkLogo = ({ isCollapsed, onClick, className }: Props) => {
         alt={ `${ config.chain.name } network icon` }
         fallback={ <LogoFallback isCollapsed={ isCollapsed } isSmall/> }
         display={{ base: 'none', lg: isCollapsed === false ? 'none' : 'block', xl: isCollapsed ? 'block' : 'none' }}
-        filter={{ _dark: !config.UI.navigation.icon.dark ? INVERT_FILTER : undefined }}
         objectFit="contain"
         objectPosition="left"
       />
