@@ -1,11 +1,11 @@
 import React from 'react';
 
-export const BlueLineGradient = {
-  id: 'blue-line-gradient',
+export const OrangeLineGradient = {
+  id: 'orange-line-gradient',
   defs: () => (
-    <linearGradient id="blue-line-gradient">
-      <stop offset="0%" stopColor="#4299E1"/>
-      <stop offset="100%" stopColor="#00B5D8"/>
+    <linearGradient id="orange-line-gradient">
+      <stop offset="0%" stopColor="#F6741D"/>
+      <stop offset="100%" stopColor="#FFA217"/>
     </linearGradient>
   ),
 };

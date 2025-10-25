@@ -46,6 +46,7 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
     },
     bg: {
       primary: { value: { _light: '{colors.theme.bg.primary._light}', _dark: '{colors.theme.bg.primary._dark}' } },
+      emphasized: { value: { _light: '{colors.orange.50}', _dark: '{colors.orange.900}' } },
     },
     border: {
       divider: { value: { _light: '{colors.blackAlpha.100}', _dark: '{colors.whiteAlpha.100}' } },

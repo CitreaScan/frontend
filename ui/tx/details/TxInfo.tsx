@@ -620,6 +620,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
               exchangeRate={ data.exchange_rate }
               isLoading={ isLoading }
               flexWrap="wrap"
+              accuracyUsd={ 2 }
             />
           </DetailedInfo.ItemValue>
         </>
@@ -640,6 +641,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
               currency={ currencyUnits.ether }
               exchangeRate={ data.exchange_rate }
               flexWrap="wrap"
+              accuracyUsd={ 2 }
             />
           </DetailedInfo.ItemValue>
         </>
@@ -660,6 +662,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
               exchangeRate={ data.exchange_rate }
               flexWrap="wrap"
               isLoading={ isLoading }
+              accuracyUsd={ 2 }
             />
           </DetailedInfo.ItemValue>
 
@@ -676,6 +679,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
               exchangeRate={ data.exchange_rate }
               flexWrap="wrap"
               isLoading={ isLoading }
+              accuracyUsd={ 2 }
             />
           </DetailedInfo.ItemValue>
         </>

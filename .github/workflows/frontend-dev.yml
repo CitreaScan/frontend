@@ -50,7 +50,7 @@ jobs:
           inlineScript: |
             echo "Update docker container..."
 
-            CONTENT=$(base64 -w0 ./.env.vm_citrea_testnet_dev)
+            CONTENT=$(base64 -w0 ./.env.dev)
 
             az vm run-command invoke \
               --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \

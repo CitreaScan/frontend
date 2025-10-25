@@ -50,6 +50,7 @@ const TxDetailsBurntFees = ({ data, isLoading }: Props) => {
           flexWrap="wrap"
           rowGap={ 0 }
           isLoading={ isLoading }
+          accuracyUsd={ 2 }
         />
       </DetailedInfo.ItemValue>
     </>

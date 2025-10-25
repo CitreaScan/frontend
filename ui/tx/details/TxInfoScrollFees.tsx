@@ -34,6 +34,7 @@ export const TxInfoScrollFees = ({ data, isLoading }: Props) => {
               currency={ currencyUnits.ether }
               exchangeRate={ data.exchange_rate }
               flexWrap="wrap"
+              accuracyUsd={ 2 }
             />
           </DetailedInfo.ItemValue>
         </>
@@ -53,6 +54,7 @@ export const TxInfoScrollFees = ({ data, isLoading }: Props) => {
               currency={ currencyUnits.ether }
               exchangeRate={ data.exchange_rate }
               flexWrap="wrap"
+              accuracyUsd={ 2 }
             />
           </DetailedInfo.ItemValue>
         </>
@@ -72,6 +74,7 @@ export const TxInfoScrollFees = ({ data, isLoading }: Props) => {
               currency={ currencyUnits.ether }
               exchangeRate={ data.exchange_rate }
               flexWrap="wrap"
+              accuracyUsd={ 2 }
             />
           </DetailedInfo.ItemValue>
         </>
@@ -92,6 +95,7 @@ export const TxInfoScrollFees = ({ data, isLoading }: Props) => {
                 currency={ currencyUnits.ether }
                 exchangeRate={ data.exchange_rate }
                 flexWrap="wrap"
+                accuracyUsd={ 2 }
               />
             </Skeleton>
           </DetailedInfo.ItemValue>
