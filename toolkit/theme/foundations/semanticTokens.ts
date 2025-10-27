@@ -124,40 +124,40 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
         bg: {
           DEFAULT: {
             value: {
-              _light: heroBannerButton?._default?.background?.[0] || '{colors.theme.button.primary._light}',
-              _dark: heroBannerButton?._default?.background?.[1] || heroBannerButton?._default?.background?.[0] || '{colors.theme.button.primary._dark}',
+              _light: heroBannerButton?._default?.background?.[0] || '{colors.white}',
+              _dark: heroBannerButton?._default?.background?.[1] || heroBannerButton?._default?.background?.[0] || '{colors.black}',
             },
           },
           hover: {
             value: {
-              _light: heroBannerButton?._hover?.background?.[0] || '{colors.hover}',
-              _dark: heroBannerButton?._hover?.background?.[1] || heroBannerButton?._hover?.background?.[0] || '{colors.hover}',
+              _light: heroBannerButton?._hover?.background?.[0] || '{colors.whiteAlpha.700}',
+              _dark: heroBannerButton?._hover?.background?.[1] || heroBannerButton?._hover?.background?.[0] || '{colors.blackAlpha.700}',
             },
           },
           selected: {
             value: {
-              _light: heroBannerButton?._selected?.background?.[0] || '{colors.orange.50}',
-              _dark: heroBannerButton?._selected?.background?.[1] || heroBannerButton?._selected?.background?.[0] || '{colors.orange.50}',
+              _light: heroBannerButton?._selected?.background?.[0] || '{colors.white}',
+              _dark: heroBannerButton?._selected?.background?.[1] || heroBannerButton?._selected?.background?.[0] || '{colors.black}',
             },
           },
         },
         fg: {
           DEFAULT: {
             value: {
-              _light: heroBannerButton?._default?.text_color?.[0] || '{colors.white}',
-              _dark: heroBannerButton?._default?.text_color?.[1] || heroBannerButton?._default?.text_color?.[0] || '{colors.white}',
+              _light: heroBannerButton?._default?.text_color?.[0] || '{colors.gray.800}',
+              _dark: heroBannerButton?._default?.text_color?.[1] || heroBannerButton?._default?.text_color?.[0] || '{colors.gray.50}',
             },
           },
           hover: {
             value: {
-              _light: heroBannerButton?._hover?.text_color?.[0] || '{colors.white}',
-              _dark: heroBannerButton?._hover?.text_color?.[1] || heroBannerButton?._hover?.text_color?.[0] || '{colors.white}',
+              _light: heroBannerButton?._hover?.text_color?.[0] || '{colors.gray.800}',
+              _dark: heroBannerButton?._hover?.text_color?.[1] || heroBannerButton?._hover?.text_color?.[0] || '{colors.gray.50}',
             },
           },
           selected: {
             value: {
-              _light: heroBannerButton?._selected?.text_color?.[0] || '{colors.blackAlpha.800}',
-              _dark: heroBannerButton?._selected?.text_color?.[1] || heroBannerButton?._selected?.text_color?.[0] || '{colors.blackAlpha.800}',
+              _light: heroBannerButton?._selected?.text_color?.[0] || '{colors.gray.800}',
+              _dark: heroBannerButton?._selected?.text_color?.[1] || heroBannerButton?._selected?.text_color?.[0] || '{colors.gray.50}',
             },
           },
         },
@@ -260,7 +260,7 @@ const semanticTokens: ThemingConfig['semanticTokens'] = {
       bg: {
         info: { value: { _light: '{colors.blackAlpha.50}', _dark: '{colors.whiteAlpha.100}' } },
         warning: { value: { _light: 'rgba(0, 0, 0, 0.03)', _dark: '{colors.orange.800/44}' } },
-        warning_table: { value: { _light: '{colors.orange.50}', _dark: '{colors.orange.800/44}' } },
+        warning_table: { value: { _light: '{colors.orange.50}', _dark: '{colors.yellow.500/20}' } },
         success: { value: { _light: '{colors.green.100}', _dark: '{colors.green.900}' } },
         error: { value: { _light: '{colors.red.100}', _dark: '{colors.red.900}' } },
       },

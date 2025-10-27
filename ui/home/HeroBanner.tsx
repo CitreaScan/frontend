@@ -18,11 +18,11 @@ const HeroBanner = () => {
   const gradient = {
     _light:
       config.UI.homepage.heroBanner?.background?.[0] ||
-      'radial-gradient(ellipse 100% 285% at 100% 100%, rgba(224, 254, 109, 0.30) 0%, rgba(153, 243, 163, 0.30) 28%, transparent 100%)',
+      'linear-gradient(90deg, #EA5729 0%, #F6741D 25%, #ECC94B 50%, #F6741D 75%, #EA5729 100%)',
     _dark:
       config.UI.homepage.heroBanner?.background?.[1] ||
       config.UI.homepage.heroBanner?.background?.[0] ||
-      'radial-gradient(ellipse 100% 285% at 100% 100%, rgba(224, 254, 109, 0.15) 0%, rgba(153, 243, 163, 0.15) 28%, transparent 100%)',
+      'linear-gradient(90deg, #EA5729 0%, #F6741D 25%, #ECC94B 50%, #F6741D 75%, #EA5729 100%)',
   };
 
   const border = {
@@ -36,7 +36,6 @@ const HeroBanner = () => {
     <Flex
       w="100%"
       bgImage={ gradient }
-      bg="whiteAlpha.50"
       border={ border }
       borderRadius="md"
       p={{ base: 4, lg: 8 }}
@@ -50,10 +49,9 @@ const HeroBanner = () => {
             fontSize={{ base: '18px', lg: '30px' }}
             lineHeight={{ base: '24px', lg: '36px' }}
             fontWeight={{ base: 500, lg: 700 }}
-            bgImage="linear-gradient(to right, #f7732d, #f07823 43.75%, #ffa217 84.615%)"
-            bgClip="text"
+            color="white"
           >
-            Citrea Testnet explorer
+            Citreascan explorer
           </Heading>
           { config.UI.navigation.layout === 'vertical' && (
             <Box display={{ base: 'none', lg: 'flex' }} gap={ 2 }>

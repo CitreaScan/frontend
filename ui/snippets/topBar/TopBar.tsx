@@ -11,14 +11,14 @@ import TopBarStats from './TopBarStats';
 
 const TopBar = () => {
   return (
-    // Citrea brand orange top banner
+    // Top bar with gas stats and settings
     <Box
-      bgColor={{ _light: 'orange.600', _dark: 'orange.700' }}
+      bgColor={{ _light: 'gray.50', _dark: 'whiteAlpha.100' }}
       position="sticky"
       left={ 0 }
       width="100%"
       maxWidth="100vw"
-      color="white"
+      color={{ _light: 'blackAlpha.800', _dark: 'white' }}
     >
       <Flex
         py={ 2 }
@@ -33,13 +33,13 @@ const TopBar = () => {
           { config.features.deFiDropdown.isEnabled && (
             <>
               <DeFiDropdown/>
-              <Separator mr={ 3 } ml={{ base: 2, sm: 3 }} height={ 4 } orientation="vertical" borderColor="whiteAlpha.400"/>
+              <Separator mr={ 3 } ml={{ base: 2, sm: 3 }} height={ 4 } orientation="vertical" borderColor={{ _light: 'gray.300', _dark: 'whiteAlpha.400' }}/>
             </>
           ) }
           <Settings/>
           { Boolean(config.UI.featuredNetworks.items) && (
             <>
-              <Separator mx={ 3 } height={ 4 } orientation="vertical" borderColor="whiteAlpha.400"/>
+              <Separator mx={ 3 } height={ 4 } orientation="vertical" borderColor={{ _light: 'gray.300', _dark: 'whiteAlpha.400' }}/>
               <NetworkMenu/>
             </>
           ) }
