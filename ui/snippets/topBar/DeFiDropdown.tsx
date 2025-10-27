@@ -37,7 +37,16 @@ const DeFiDropdown = () => {
   return items.length > 1 ? (
     <PopoverRoot>
       <PopoverTrigger>
-        <Button size="2xs" gap={ 0 } color="white" borderColor="whiteAlpha.400" _hover={{ borderColor: 'white', bg: 'whiteAlpha.200' }}>
+        <Button
+          size="2xs"
+          gap={ 0 }
+          color={{ _light: 'blackAlpha.800', _dark: 'white' }}
+          borderColor={{ _light: 'gray.300', _dark: 'whiteAlpha.400' }}
+          _hover={{
+            borderColor: { _light: 'gray.700', _dark: 'white' },
+            bg: { _light: 'gray.100', _dark: 'whiteAlpha.200' },
+          }}
+        >
           <chakra.span display={{ base: 'none', lg: 'inline' }} whiteSpace="pre-wrap">
             Blockscout{ space }
           </chakra.span>
@@ -65,7 +74,16 @@ const DeFiDropdown = () => {
       target={ items[0].dappId ? '_self' : '_blank' }
       asChild
     >
-      <Button onClick={ items[0].onClick } size="2xs" color="white" borderColor="whiteAlpha.400" _hover={{ borderColor: 'white', bg: 'whiteAlpha.200' }}>
+      <Button
+        onClick={ items[0].onClick }
+        size="2xs"
+        color={{ _light: 'blackAlpha.800', _dark: 'white' }}
+        borderColor={{ _light: 'gray.300', _dark: 'whiteAlpha.400' }}
+        _hover={{
+          borderColor: { _light: 'gray.700', _dark: 'white' },
+          bg: { _light: 'gray.100', _dark: 'whiteAlpha.200' },
+        }}
+      >
         <IconSvg name={ items[0].icon } boxSize={ 3 } mr={{ base: 0, sm: 1 }} color="currentColor"/>
         <Box display={{ base: 'none', sm: 'inline' }}>
           { items[0].text }

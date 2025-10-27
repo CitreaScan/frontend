@@ -43,8 +43,8 @@ const Settings = () => {
               size="2xs"
               borderRadius="sm"
               aria-label="User settings"
-              color="white"
-              _hover={{ color: 'whiteAlpha.800' }}
+              color={{ _light: 'orange.600', _dark: 'orange.500' }}
+              _hover={{ color: { _light: 'orange.700', _dark: 'orange.400' } }}
             >
               <IconSvg name="gear_slim" color="currentColor"/>
             </IconButton>
