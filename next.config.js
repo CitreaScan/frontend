@@ -12,6 +12,7 @@ const rewrites = require('./nextjs/rewrites');
 
 /** @type {import('next').NextConfig} */
 const moduleExports = {
+  compress: false,
   transpilePackages: [
     'react-syntax-highlighter',
   ],
@@ -27,6 +28,14 @@ const moduleExports = {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
 
     return config;
+  },
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
   },
   // NOTE: all config functions should be static and not depend on any environment variables
   // since all variables will be passed to the app only at runtime and there is now way to change Next.js config at this time

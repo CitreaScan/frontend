@@ -85,6 +85,7 @@ const SocketNewItemsNotice = chakra(({ children, className, url, num, showErrorA
       px={ 4 }
       py="6px"
       fontSize="sm"
+      fontWeight={ !showErrorAlert ? 'medium' : undefined }
     >
       { alertContent }
     </Alert>

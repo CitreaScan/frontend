@@ -13,7 +13,7 @@ interface Props {
 
 const SettingsSample = ({ label, value, bg, onClick, isActive }: Props) => {
   const bgColor = { base: 'white', _dark: 'gray.900' };
-  const activeBgColor = { base: 'blue.50', _dark: 'whiteAlpha.100' };
+  const activeBgColor = { base: 'orange.50', _dark: 'whiteAlpha.100' };
   const activeBorderColor = { base: 'blackAlpha.800', _dark: 'gray.50' };
 
   return (

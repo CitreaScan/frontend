@@ -106,19 +106,29 @@ const LatestBlocks = () => {
 
   const networkUtilization = getNetworkUtilizationParams(statsQueryResult.data?.network_utilization_percentage ?? 0);
 
+  const hasNetworkUtilization = statsQueryResult.data?.network_utilization_percentage !== undefined;
+
   return (
     <Box width={{ base: '100%', lg: '280px' }} flexShrink={ 0 }>
       <Heading level="3">Latest blocks</Heading>
-      { statsQueryResult.data?.network_utilization_percentage !== undefined && (
-        <Skeleton loading={ statsQueryResult.isPlaceholderData } mt={ 2 } display="inline-block" textStyle="sm">
-          <Text as="span">
-            Network utilization:{ nbsp }
-          </Text>
-          <Tooltip content={ `${ upperFirst(networkUtilization.load) } load` }>
-            <Text as="span" color={ networkUtilization.color } fontWeight={ 700 }>
-              { statsQueryResult.data?.network_utilization_percentage.toFixed(2) }%
+      { hasNetworkUtilization && (
+        <Skeleton loading={ statsQueryResult.isPlaceholderData } borderRadius="md" mt={ 3 }>
+          <Box
+            borderRadius="md"
+            border="1px solid"
+            borderColor="border.divider"
+            p={ 3 }
+            textStyle="sm"
+          >
+            <Text as="span" color="text.secondary">
+              Network utilization:{ nbsp }
             </Text>
-          </Tooltip>
+            <Tooltip content={ `${ upperFirst(networkUtilization.load) } load` }>
+              <Text as="span" color={ networkUtilization.color } fontWeight={ 700 }>
+                { statsQueryResult.data?.network_utilization_percentage.toFixed(2) }%
+              </Text>
+            </Tooltip>
+          </Box>
         </Skeleton>
       ) }
       { statsQueryResult.data?.celo && (
@@ -127,7 +137,7 @@ const LatestBlocks = () => {
           <chakra.span fontWeight={ 700 }>#{ statsQueryResult.data.celo.epoch_number }</chakra.span>
         </Box>
       ) }
-      <Box mt={ 3 }>
+      <Box mt={ hasNetworkUtilization ? 2 : 3 }>
         { content }
       </Box>
     </Box>
