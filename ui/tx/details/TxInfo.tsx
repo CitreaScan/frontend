@@ -312,20 +312,22 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
       <DetailedInfo.ItemValue multiRow={ Boolean(data.scroll?.l2_block_status) }>
         { data.block_number === null ?
           <Text>Pending</Text> : (
-            <BlockEntity
-              isLoading={ isLoading }
-              number={ data.block_number }
-              noIcon
-            />
+            <>
+              <BlockEntity
+                isLoading={ isLoading }
+                number={ data.block_number }
+                noIcon
+              />
+              { Boolean(data.confirmations) && (
+                <>
+                  <TextSeparator/>
+                  <Skeleton loading={ isLoading } color="text.secondary">
+                    <span>{ data.confirmations } Block confirmations</span>
+                  </Skeleton>
+                </>
+              ) }
+            </>
           ) }
-        { Boolean(data.confirmations) && (
-          <>
-            <TextSeparator/>
-            <Skeleton loading={ isLoading } color="text.secondary">
-              <span>{ data.confirmations } Block confirmations</span>
-            </Skeleton>
-          </>
-        ) }
         { data.scroll?.l2_block_status && (
           <>
             <TextSeparator/>
