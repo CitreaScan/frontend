@@ -48,6 +48,12 @@ const Footer = () => {
       text: 'X.com',
       url: 'https://x.com/CitreaScan',
     },
+    {
+      icon: 'docs' as const,
+      iconSize: '18px',
+      text: 'Docs',
+      url: 'http://docs.citreascan.com/',
+    },
   ];
 
   const frontendLink = (() => {
