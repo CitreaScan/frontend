@@ -10,7 +10,7 @@ env:
   AZURE_RESOURCE_GROUP: rg-dfx-api-prd
   AZURE_VM_NAME: vm-dfx-node-prd
   AZURE_FRONT_DOOR: 'afd-dfx-api-prd'
-  AZURE_FRONT_DOOR_ENDPOINT: 'fde-dfx-ctef-prd'
+  AZURE_FRONT_DOOR_ENDPOINT: 'fde-dfx-cmef-prd'
 
 jobs:
   build-and-deploy:
@@ -56,7 +56,7 @@ jobs:
               --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
               --name ${{ env.AZURE_VM_NAME }} \
               --command-id RunShellScript \
-              --scripts "echo $CONTENT | base64 -d > /home/dfx/docker-compose-blockscout-citrea-testnet.frontend.env && /home/dfx/update-blockscout.sh frontend"
+              --scripts "echo $CONTENT | base64 -d > /home/dfx/docker-compose-blockscout-citrea.frontend.env && /home/dfx/update-blockscout.sh frontend"
 
       - name: Purge Frontdoor endpoint
         uses: azure/CLI@v2
