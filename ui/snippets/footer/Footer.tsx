@@ -52,7 +52,7 @@ const Footer = () => {
       icon: 'docs' as const,
       iconSize: '18px',
       text: 'Docs',
-      url: 'http://docs.citreascan.com/',
+      url: 'https://docs.citreascan.com/',
     },
   ];
 
