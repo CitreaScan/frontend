@@ -1,0 +1,59 @@
+name: Sync Stablecoin Addresses
+
+on:
+  schedule:
+    # Run weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install required packages temporarily
+        run: npm install @juicedollar/jusd @juiceswapxyz/sdk-core --no-save
+
+      - name: Run sync script
+        id: sync
+        run: |
+          node scripts/sync-stablecoin-addresses.js
+          if git diff --quiet lib/token/stablecoin-addresses.generated.ts; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.sync.outputs.changes == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update token addresses from npm packages'
+          title: 'chore: update token addresses'
+          body: |
+            This PR updates token addresses from npm packages:
+            - Stablecoin addresses from `@juicedollar/jusd`
+            - Wrapped native token addresses from `@juiceswapxyz/sdk-core`
+
+            **Changes detected in contract addresses.**
+
+            Please review the changes and merge if they look correct.
+
+            ---
+            *This PR was automatically created by the [Sync Stablecoin Addresses](.github/workflows/sync-stablecoin-addresses.yml) workflow.*
+          branch: chore/update-token-addresses
+          base: develop
+          delete-branch: true
