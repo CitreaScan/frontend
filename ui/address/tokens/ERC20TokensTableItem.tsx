@@ -4,7 +4,9 @@ import React from 'react';
 import type { AddressTokenBalance } from 'types/api/address';
 
 import config from 'configs/app';
+import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { getEffectiveExchangeRate } from 'lib/token/stablecoins';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import { TableCell, TableRow } from 'toolkit/chakra/table';
 import AddressAddToWallet from 'ui/shared/address/AddressAddToWallet';
@@ -21,15 +23,32 @@ const ERC20TokensTableItem = ({
   value,
   isLoading,
 }: Props) => {
+  const statsQuery = useApiQuery('general:stats', {
+    queryOptions: { refetchOnMount: false },
+  });
+  const nativeExchangeRate = statsQuery.data?.coin_price;
+
+  const effectiveExchangeRate = getEffectiveExchangeRate(
+    token.address_hash,
+    token.exchange_rate,
+    nativeExchangeRate,
+  );
 
   const {
     valueStr: tokenQuantity,
     usd: tokenValue,
   } = getCurrencyValue({
-    value, exchangeRate: token.exchange_rate, decimals: token.decimals, accuracy: 8, accuracyUsd: 2, tokenAddress: token.address_hash,
+    value,
+    exchangeRate: token.exchange_rate,
+    decimals: token.decimals,
+    accuracy: 8,
+    accuracyUsd: 2,
+    tokenAddress: token.address_hash,
+    nativeExchangeRate,
   });
 
-  const isNativeToken = celoFeature.isEnabled && token.address_hash.toLowerCase() === celoFeature.nativeTokenAddress?.toLowerCase();
+  const isNativeToken = celoFeature.isEnabled &&
+    token.address_hash.toLowerCase() === celoFeature.nativeTokenAddress?.toLowerCase();
 
   return (
     <TableRow role="group" >
@@ -59,7 +78,7 @@ const ERC20TokensTableItem = ({
       </TableCell>
       <TableCell isNumeric verticalAlign="middle">
         <Skeleton loading={ isLoading } display="inline-block" color={ isNativeToken ? 'text.secondary' : undefined }>
-          { token.exchange_rate && `$${ Number(token.exchange_rate).toLocaleString() }` }
+          { effectiveExchangeRate && `$${ Number(effectiveExchangeRate).toLocaleString() }` }
         </Skeleton>
       </TableCell>
       <TableCell isNumeric verticalAlign="middle">

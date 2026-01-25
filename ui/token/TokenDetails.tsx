@@ -36,6 +36,11 @@ const TokenDetails = ({ tokenQuery }: Props) => {
 
   const hash = router.query.hash?.toString();
 
+  const statsQuery = useApiQuery('general:stats', {
+    queryOptions: { refetchOnMount: false },
+  });
+  const nativeExchangeRate = statsQuery.data?.coin_price;
+
   const tokenCountersQuery = useApiQuery('general:token_counters', {
     pathParams: { hash },
     queryOptions: { enabled: Boolean(router.query.hash), placeholderData: TOKEN_COUNTERS },
@@ -88,7 +93,7 @@ const TokenDetails = ({ tokenQuery }: Props) => {
     type,
   } = tokenQuery.data || {};
 
-  const exchangeRate = getEffectiveExchangeRate(hash, apiExchangeRate);
+  const exchangeRate = getEffectiveExchangeRate(hash, apiExchangeRate, nativeExchangeRate);
 
   let totalSupplyValue;
 

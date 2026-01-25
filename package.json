@@ -134,6 +134,8 @@
     "@chakra-ui/cli": "3.15.0",
     "@eslint/compat": "1.2.2",
     "@eslint/js": "9.14.0",
+    "@juicedollar/jusd": "^1.1.0",
+    "@juiceswapxyz/sdk-core": "^0.1.11-beta.0",
     "@next/eslint-plugin-next": "15.0.3",
     "@playwright/experimental-ct-react": "1.49.0",
     "@playwright/test": "1.49.0",

@@ -4,7 +4,9 @@ import React from 'react';
 import type { AddressTokenBalance } from 'types/api/address';
 
 import config from 'configs/app';
+import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { getEffectiveExchangeRate } from 'lib/token/stablecoins';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import AddressAddToWallet from 'ui/shared/address/AddressAddToWallet';
 import NativeTokenTag from 'ui/shared/celo/NativeTokenTag';
@@ -17,15 +19,32 @@ const celoFeature = config.features.celo;
 type Props = AddressTokenBalance & { isLoading: boolean };
 
 const ERC20TokensListItem = ({ token, value, isLoading }: Props) => {
+  const statsQuery = useApiQuery('general:stats', {
+    queryOptions: { refetchOnMount: false },
+  });
+  const nativeExchangeRate = statsQuery.data?.coin_price;
+
+  const effectiveExchangeRate = getEffectiveExchangeRate(
+    token.address_hash,
+    token.exchange_rate,
+    nativeExchangeRate,
+  );
 
   const {
     valueStr: tokenQuantity,
     usd: tokenValue,
   } = getCurrencyValue({
-    value, exchangeRate: token.exchange_rate, decimals: token.decimals, accuracy: 8, accuracyUsd: 2, tokenAddress: token.address_hash,
+    value,
+    exchangeRate: token.exchange_rate,
+    decimals: token.decimals,
+    accuracy: 8,
+    accuracyUsd: 2,
+    tokenAddress: token.address_hash,
+    nativeExchangeRate,
   });
 
-  const isNativeToken = celoFeature.isEnabled && token.address_hash.toLowerCase() === celoFeature.nativeTokenAddress?.toLowerCase();
+  const isNativeToken = celoFeature.isEnabled &&
+    token.address_hash.toLowerCase() === celoFeature.nativeTokenAddress?.toLowerCase();
 
   return (
     <ListItemMobile rowGap={ 2 }>
@@ -49,11 +68,11 @@ const ERC20TokensListItem = ({ token, value, isLoading }: Props) => {
         />
         <AddressAddToWallet token={ token } ml={ 2 } isLoading={ isLoading }/>
       </Flex>
-      { token.exchange_rate !== undefined && token.exchange_rate !== null && (
+      { effectiveExchangeRate && (
         <HStack gap={ 3 }>
           <Skeleton loading={ isLoading } fontSize="sm" fontWeight={ 500 }>Price</Skeleton>
           <Skeleton loading={ isLoading } fontSize="sm" color="text.secondary">
-            <span>{ `$${ Number(token.exchange_rate).toLocaleString() }` }</span>
+            <span>{ `$${ Number(effectiveExchangeRate).toLocaleString() }` }</span>
           </Skeleton>
         </HStack>
       ) }

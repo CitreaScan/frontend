@@ -4,6 +4,7 @@ import React from 'react';
 import type { TokenTransfer } from 'types/api/tokenTransfer';
 import type { ChainConfig } from 'types/multichain';
 
+import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
 import { getTokenTypeName } from 'lib/token/tokenTypes';
 import { Badge } from 'toolkit/chakra/badge';
@@ -39,6 +40,11 @@ const TokenTransferListItem = ({
   isLoading,
   chainData,
 }: Props) => {
+  const statsQuery = useApiQuery('general:stats', {
+    queryOptions: { refetchOnMount: false },
+  });
+  const nativeExchangeRate = statsQuery.data?.coin_price;
+
   const { usd, valueStr } = total && 'value' in total && total.value !== null ? getCurrencyValue({
     value: total.value,
     exchangeRate: token?.exchange_rate,
@@ -46,6 +52,7 @@ const TokenTransferListItem = ({
     accuracyUsd: 2,
     decimals: total.decimals || '0',
     tokenAddress: token?.address_hash,
+    nativeExchangeRate,
   }) : { usd: null, valueStr: null };
 
   return (

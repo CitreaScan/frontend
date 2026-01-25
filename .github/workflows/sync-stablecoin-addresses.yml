@@ -23,8 +23,8 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install @juicedollar/jusd temporarily
-        run: npm install @juicedollar/jusd --no-save
+      - name: Install required packages temporarily
+        run: npm install @juicedollar/jusd @juiceswapxyz/sdk-core --no-save
 
       - name: Run sync script
         id: sync
@@ -41,10 +41,12 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore: update stablecoin addresses from @juicedollar/jusd'
-          title: 'chore: update stablecoin addresses'
+          commit-message: 'chore: update token addresses from npm packages'
+          title: 'chore: update token addresses'
           body: |
-            This PR updates the stablecoin addresses from the `@juicedollar/jusd` package.
+            This PR updates token addresses from npm packages:
+            - Stablecoin addresses from `@juicedollar/jusd`
+            - Wrapped native token addresses from `@juiceswapxyz/sdk-core`
 
             **Changes detected in contract addresses.**
 
@@ -52,6 +54,6 @@ jobs:
 
             ---
             *This PR was automatically created by the [Sync Stablecoin Addresses](.github/workflows/sync-stablecoin-addresses.yml) workflow.*
-          branch: chore/update-stablecoin-addresses
+          branch: chore/update-token-addresses
           base: develop
           delete-branch: true

@@ -10,16 +10,25 @@ interface Params {
   accuracyUsd?: number;
   decimals?: string | null;
   tokenAddress?: string;
+  nativeExchangeRate?: string | null;
 }
 
-export default function getCurrencyValue({ value, accuracy, accuracyUsd, decimals, exchangeRate, tokenAddress }: Params) {
+export default function getCurrencyValue({
+  value,
+  accuracy,
+  accuracyUsd,
+  decimals,
+  exchangeRate,
+  tokenAddress,
+  nativeExchangeRate,
+}: Params) {
   const valueCurr = BigNumber(value).div(BigNumber(10 ** Number(decimals || '18')));
   const valueResult = accuracy ? valueCurr.dp(accuracy).toFormat() : valueCurr.toFormat();
 
   let usdResult: string | undefined;
   let usdBn = ZERO;
 
-  const effectiveExchangeRate = getEffectiveExchangeRate(tokenAddress, exchangeRate);
+  const effectiveExchangeRate = getEffectiveExchangeRate(tokenAddress, exchangeRate, nativeExchangeRate);
 
   if (effectiveExchangeRate) {
     const exchangeRateBn = new BigNumber(effectiveExchangeRate);
