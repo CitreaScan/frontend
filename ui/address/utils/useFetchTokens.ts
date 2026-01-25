@@ -14,6 +14,7 @@ interface Props {
   hash?: string;
   enabled?: boolean;
   vaultPricesVersion?: number;
+  nativeExchangeRate?: string | null;
 }
 
 const tokenBalanceItemIdentityFactory = (match: AddressTokenBalance) => (item: AddressTokenBalance) => ((
@@ -22,7 +23,7 @@ const tokenBalanceItemIdentityFactory = (match: AddressTokenBalance) => (item: A
   match.token_instance?.id === item.token_instance?.id
 ));
 
-export default function useFetchTokens({ hash, enabled, vaultPricesVersion }: Props) {
+export default function useFetchTokens({ hash, enabled, vaultPricesVersion, nativeExchangeRate }: Props) {
   const erc20query = useApiQuery('general:address_tokens', {
     pathParams: { hash },
     queryParams: { type: 'ERC-20' },
@@ -118,24 +119,24 @@ export default function useFetchTokens({ hash, enabled, vaultPricesVersion }: Pr
   const data = React.useMemo(() => {
     return {
       'ERC-20': {
-        items: erc20query.data?.items.map((item) => calculateUsdValue(item)) || [],
+        items: erc20query.data?.items.map((item) => calculateUsdValue(item, nativeExchangeRate)) || [],
         isOverflow: Boolean(erc20query.data?.next_page_params),
       },
       'ERC-721': {
-        items: erc721query.data?.items.map((item) => calculateUsdValue(item)) || [],
+        items: erc721query.data?.items.map((item) => calculateUsdValue(item, nativeExchangeRate)) || [],
         isOverflow: Boolean(erc721query.data?.next_page_params),
       },
       'ERC-1155': {
-        items: erc1155query.data?.items.map((item) => calculateUsdValue(item)) || [],
+        items: erc1155query.data?.items.map((item) => calculateUsdValue(item, nativeExchangeRate)) || [],
         isOverflow: Boolean(erc1155query.data?.next_page_params),
       },
       'ERC-404': {
-        items: erc404query.data?.items.map((item) => calculateUsdValue(item)) || [],
+        items: erc404query.data?.items.map((item) => calculateUsdValue(item, nativeExchangeRate)) || [],
         isOverflow: Boolean(erc1155query.data?.next_page_params),
       },
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ erc1155query.data, erc20query.data, erc721query.data, erc404query.data, vaultPricesVersion ]);
+  }, [ erc1155query.data, erc20query.data, erc721query.data, erc404query.data, vaultPricesVersion, nativeExchangeRate ]);
 
   return {
     isPending: erc20query.isPending || erc721query.isPending || erc1155query.isPending || erc404query.isPending,

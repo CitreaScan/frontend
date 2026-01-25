@@ -36,6 +36,7 @@ const AddressNetWorth = ({ addressData, isLoading, addressHash }: Props) => {
     hash: addressData?.hash,
     enabled: addressData?.has_tokens,
     vaultPricesVersion: pricesVersion,
+    nativeExchangeRate: addressData?.exchange_rate,
   });
 
   const { usdBn: nativeUsd } = getCurrencyValue({
