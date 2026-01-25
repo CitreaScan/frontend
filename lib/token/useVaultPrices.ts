@@ -5,7 +5,7 @@ import config from 'configs/app';
 import { VAULT_TOKEN_ADDRESSES } from './stablecoin-addresses.generated';
 import { setCachedVaultPrice } from './stablecoins';
 
-const VAULT_PRICE_STALE_TIME = 5 * 60 * 1000; // 5 minutes
+const VAULT_PRICE_STALE_TIME = 60 * 60 * 1000; // 1 hour
 
 // ERC-4626 function selectors
 const TOTAL_ASSETS_SELECTOR = '0x01e1d114';

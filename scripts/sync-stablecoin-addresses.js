@@ -27,6 +27,9 @@ const STABLECOIN_KEYS = [ 'juiceDollar', 'startUSD', 'USDC', 'USDT', 'CTUSD' ];
 // Vault token keys to extract (ERC-4626 vaults with stablecoin underlying)
 const VAULT_TOKEN_KEYS = [ 'savingsVaultJUSD' ];
 
+// Equity token keys to extract (tokens with built-in price() function)
+const EQUITY_TOKEN_KEYS = [ 'equity' ];
+
 function extractStablecoinAddresses() {
   let ADDRESS;
   try {
@@ -92,6 +95,38 @@ function extractVaultTokenAddresses() {
   return result;
 }
 
+function extractEquityTokenAddresses() {
+  let ADDRESS;
+  try {
+    const jusd = require('@juicedollar/jusd');
+    ADDRESS = jusd.ADDRESS;
+  } catch (error) {
+    console.error('Error: @juicedollar/jusd package not found.');
+    process.exit(1);
+  }
+
+  const result = {};
+
+  for (const [ chainId, addresses ] of Object.entries(ADDRESS)) {
+    if (!SUPPORTED_CHAIN_IDS.includes(chainId)) continue;
+
+    const equityTokens = [];
+
+    for (const key of EQUITY_TOKEN_KEYS) {
+      const addr = addresses[key];
+      if (addr && addr !== ZERO_ADDRESS) {
+        equityTokens.push(addr.toLowerCase());
+      }
+    }
+
+    if (equityTokens.length > 0) {
+      result[chainId] = equityTokens;
+    }
+  }
+
+  return result;
+}
+
 function extractWrappedNativeAddresses() {
   let WETH9;
   try {
@@ -116,7 +151,7 @@ function extractWrappedNativeAddresses() {
   return result;
 }
 
-function generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTokenAddresses) {
+function generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTokenAddresses, equityTokenAddresses) {
   const timestamp = new Date().toISOString();
 
   // Format stablecoin addresses object with proper indentation and single quotes
@@ -134,6 +169,14 @@ function generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTo
 
   // Format vault token addresses object
   const formattedVaultTokens = Object.entries(vaultTokenAddresses)
+    .map(([ chainId, addrs ]) => {
+      const addrLines = addrs.map((addr) => `    '${ addr }',`).join('\n');
+      return `  '${ chainId }': [\n${ addrLines }\n  ],`;
+    })
+    .join('\n');
+
+  // Format equity token addresses object
+  const formattedEquityTokens = Object.entries(equityTokenAddresses)
     .map(([ chainId, addrs ]) => {
       const addrLines = addrs.map((addr) => `    '${ addr }',`).join('\n');
       return `  '${ chainId }': [\n${ addrLines }\n  ],`;
@@ -169,6 +212,14 @@ ${ formattedWrappedNative }
 export const VAULT_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
 ${ formattedVaultTokens }
 };
+
+/**
+ * Equity token addresses by chain ID (e.g., JUICE).
+ * These tokens have a built-in price() function that returns the current price.
+ */
+export const EQUITY_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
+${ formattedEquityTokens }
+};
 `;
 }
 
@@ -182,7 +233,10 @@ function main() {
   console.log('Extracting vault token addresses from @juicedollar/jusd...');
   const vaultTokenAddresses = extractVaultTokenAddresses();
 
-  const content = generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTokenAddresses);
+  console.log('Extracting equity token addresses from @juicedollar/jusd...');
+  const equityTokenAddresses = extractEquityTokenAddresses();
+
+  const content = generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTokenAddresses, equityTokenAddresses);
 
   // Check if file exists and content is different
   let hasChanges = true;
@@ -199,6 +253,7 @@ function main() {
     console.log('Stablecoin addresses:', JSON.stringify(stablecoinAddresses, null, 2));
     console.log('Wrapped native addresses:', JSON.stringify(wrappedNativeAddresses, null, 2));
     console.log('Vault token addresses:', JSON.stringify(vaultTokenAddresses, null, 2));
+    console.log('Equity token addresses:', JSON.stringify(equityTokenAddresses, null, 2));
     process.exit(0);
   } else {
     console.log('No changes detected.');

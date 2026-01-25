@@ -38,3 +38,13 @@ export const VAULT_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
     '0x802a29bd29f02c8c477af5362f9ba88fae39cc7b',
   ],
 };
+
+/**
+ * Equity token addresses by chain ID (e.g., JUICE).
+ * These tokens have a built-in price() function that returns the current price.
+ */
+export const EQUITY_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
+  '5115': [
+    '0x7fa131991c8a7d8c21b11391c977fc7c4c8e0d5e',
+  ],
+};
