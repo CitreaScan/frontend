@@ -17,6 +17,7 @@ const FtTokenTransferSnippet = ({ token, value, decimals }: Props) => {
     exchangeRate: token.exchange_rate,
     accuracyUsd: 2,
     decimals: decimals,
+    tokenAddress: token.address_hash,
   });
 
   return (

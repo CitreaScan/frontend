@@ -21,7 +21,9 @@ const ERC20TokensListItem = ({ token, value, isLoading }: Props) => {
   const {
     valueStr: tokenQuantity,
     usd: tokenValue,
-  } = getCurrencyValue({ value: value, exchangeRate: token.exchange_rate, decimals: token.decimals, accuracy: 8, accuracyUsd: 2 });
+  } = getCurrencyValue({
+    value, exchangeRate: token.exchange_rate, decimals: token.decimals, accuracy: 8, accuracyUsd: 2, tokenAddress: token.address_hash,
+  });
 
   const isNativeToken = celoFeature.isEnabled && token.address_hash.toLowerCase() === celoFeature.nativeTokenAddress?.toLowerCase();
 

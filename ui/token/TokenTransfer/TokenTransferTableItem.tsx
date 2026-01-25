@@ -34,6 +34,7 @@ const TokenTransferTableItem = ({
     accuracy: 8,
     accuracyUsd: 2,
     decimals: total.decimals || '0',
+    tokenAddress: token?.address_hash,
   }) : { usd: null, valueStr: null };
 
   return (
