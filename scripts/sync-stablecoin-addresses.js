@@ -71,7 +71,7 @@ function generateTypeScript(addresses) {
  * Stablecoin addresses by chain ID.
  * These tokens will display a fixed price of $1.00.
  */
-export const STABLECOIN_ADDRESSES: Record<number, ReadonlyArray<string>> = {
+export const STABLECOIN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
 ${ formattedAddresses }
 };
 `;

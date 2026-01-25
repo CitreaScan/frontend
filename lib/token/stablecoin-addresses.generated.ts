@@ -7,7 +7,7 @@
  * Stablecoin addresses by chain ID.
  * These tokens will display a fixed price of $1.00.
  */
-export const STABLECOIN_ADDRESSES: Record<number, ReadonlyArray<string>> = {
+export const STABLECOIN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
   '4114': [
     '0xe045e6c36cf77faa2cfb54466d71a3aef7bbe839',
     '0x9f3096bac87e7f03dc09b0b416eb0df837304dc4',
