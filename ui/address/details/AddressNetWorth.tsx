@@ -6,6 +6,7 @@ import type { Address } from 'types/api/address';
 import config from 'configs/app';
 import getCurrencyValue from 'lib/getCurrencyValue';
 import * as mixpanel from 'lib/mixpanel/index';
+import { useVaultPrices } from 'lib/token/useVaultPrices';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import TextSeparator from 'ui/shared/TextSeparator';
 
@@ -22,7 +23,14 @@ type Props = {
 };
 
 const AddressNetWorth = ({ addressData, isLoading, addressHash }: Props) => {
-  const { data, isError, isPending } = useFetchTokens({ hash: addressData?.hash, enabled: addressData?.has_tokens });
+  // Fetch and cache vault token prices (e.g., svJUSD)
+  const { data: vaultPrices } = useVaultPrices();
+
+  const { data, isError, isPending } = useFetchTokens({
+    hash: addressData?.hash,
+    enabled: addressData?.has_tokens,
+    vaultPricesVersion: vaultPrices ? Object.keys(vaultPrices).length : 0,
+  });
 
   const { usdBn: nativeUsd } = getCurrencyValue({
     value: addressData?.coin_balance || '0',

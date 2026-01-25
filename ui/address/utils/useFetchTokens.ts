@@ -13,6 +13,7 @@ import { calculateUsdValue } from './tokenUtils';
 interface Props {
   hash?: string;
   enabled?: boolean;
+  vaultPricesVersion?: number;
 }
 
 const tokenBalanceItemIdentityFactory = (match: AddressTokenBalance) => (item: AddressTokenBalance) => ((
@@ -21,7 +22,7 @@ const tokenBalanceItemIdentityFactory = (match: AddressTokenBalance) => (item: A
   match.token_instance?.id === item.token_instance?.id
 ));
 
-export default function useFetchTokens({ hash, enabled }: Props) {
+export default function useFetchTokens({ hash, enabled, vaultPricesVersion }: Props) {
   const erc20query = useApiQuery('general:address_tokens', {
     pathParams: { hash },
     queryParams: { type: 'ERC-20' },
@@ -133,7 +134,8 @@ export default function useFetchTokens({ hash, enabled }: Props) {
         isOverflow: Boolean(erc1155query.data?.next_page_params),
       },
     };
-  }, [ erc1155query.data, erc20query.data, erc721query.data, erc404query.data ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ erc1155query.data, erc20query.data, erc721query.data, erc404query.data, vaultPricesVersion ]);
 
   return {
     isPending: erc20query.isPending || erc721query.isPending || erc1155query.isPending || erc404query.isPending,
