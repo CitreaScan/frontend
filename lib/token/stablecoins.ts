@@ -1,42 +1,17 @@
-import { ADDRESS } from '@juicedollar/jusd';
-
 import chain from 'configs/app/chain';
+
+import { STABLECOIN_ADDRESSES } from './stablecoin-addresses.generated';
 
 const STABLECOIN_PRICE = '1.00';
 
-function getStablecoinAddresses(): Array<string> {
+function getStablecoinAddressesForChain(): Set<string> {
   const chainId = Number(chain.id);
-  const addresses = ADDRESS[chainId];
+  const addresses = STABLECOIN_ADDRESSES[chainId];
 
-  if (!addresses) {
-    return [];
-  }
-
-  const stablecoins: Array<string> = [];
-
-  // JUSD stablecoin
-  if (addresses.juiceDollar && addresses.juiceDollar !== '0x0000000000000000000000000000000000000000') {
-    stablecoins.push(addresses.juiceDollar.toLowerCase());
-  }
-
-  // Underlying stablecoins
-  if (addresses.startUSD && addresses.startUSD !== '0x0000000000000000000000000000000000000000') {
-    stablecoins.push(addresses.startUSD.toLowerCase());
-  }
-  if (addresses.USDC && addresses.USDC !== '0x0000000000000000000000000000000000000000') {
-    stablecoins.push(addresses.USDC.toLowerCase());
-  }
-  if (addresses.USDT && addresses.USDT !== '0x0000000000000000000000000000000000000000') {
-    stablecoins.push(addresses.USDT.toLowerCase());
-  }
-  if (addresses.CTUSD && addresses.CTUSD !== '0x0000000000000000000000000000000000000000') {
-    stablecoins.push(addresses.CTUSD.toLowerCase());
-  }
-
-  return stablecoins;
+  return new Set(addresses ?? []);
 }
 
-const stablecoinAddresses = getStablecoinAddresses();
+const stablecoinAddresses = getStablecoinAddressesForChain();
 
 export function getEffectiveExchangeRate(
   tokenAddress: string | undefined,
@@ -46,9 +21,7 @@ export function getEffectiveExchangeRate(
     return apiExchangeRate ?? null;
   }
 
-  const normalizedAddress = tokenAddress.toLowerCase();
-
-  if (stablecoinAddresses.includes(normalizedAddress)) {
+  if (stablecoinAddresses.has(tokenAddress.toLowerCase())) {
     return STABLECOIN_PRICE;
   }
 
@@ -60,5 +33,5 @@ export function isStablecoin(tokenAddress: string | undefined): boolean {
     return false;
   }
 
-  return stablecoinAddresses.includes(tokenAddress.toLowerCase());
+  return stablecoinAddresses.has(tokenAddress.toLowerCase());
 }
