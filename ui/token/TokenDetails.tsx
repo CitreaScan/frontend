@@ -13,6 +13,7 @@ import useApiQuery from 'lib/api/useApiQuery';
 import throwOnResourceLoadError from 'lib/errors/throwOnResourceLoadError';
 import getCurrencyValue from 'lib/getCurrencyValue';
 import useIsMounted from 'lib/hooks/useIsMounted';
+import { getEffectiveExchangeRate } from 'lib/token/stablecoins';
 import { TOKEN_COUNTERS } from 'stubs/token';
 import { Link } from 'toolkit/chakra/link';
 import { Skeleton } from 'toolkit/chakra/skeleton';
@@ -79,13 +80,15 @@ const TokenDetails = ({ tokenQuery }: Props) => {
   }
 
   const {
-    exchange_rate: exchangeRate,
+    exchange_rate: apiExchangeRate,
     total_supply: totalSupply,
     circulating_market_cap: marketCap,
     decimals,
     symbol,
     type,
   } = tokenQuery.data || {};
+
+  const exchangeRate = getEffectiveExchangeRate(hash, apiExchangeRate);
 
   let totalSupplyValue;
 
