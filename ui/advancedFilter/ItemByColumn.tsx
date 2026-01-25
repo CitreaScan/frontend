@@ -68,7 +68,7 @@ const ItemByColumn = ({ item, column, isLoading }: Props) => {
       if (item.total) {
         return (
           <Skeleton loading={ isLoading }>
-            { getCurrencyValue({ value: item.total?.value, decimals: item.total.decimals, accuracy: 8 }).valueStr }
+            { getCurrencyValue({ value: item.total?.value, decimals: item.total.decimals, accuracy: 8, tokenAddress: item.token?.address_hash }).valueStr }
           </Skeleton>
         );
       }

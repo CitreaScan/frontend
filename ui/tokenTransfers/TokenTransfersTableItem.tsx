@@ -30,6 +30,7 @@ const TokenTransferTableItem = ({ item, isLoading, chainData }: Props) => {
     accuracy: 8,
     accuracyUsd: 2,
     decimals: item.total.decimals || '0',
+    tokenAddress: item.token?.address_hash,
   }) : { valueStr: null };
 
   return (
