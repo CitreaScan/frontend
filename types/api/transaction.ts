@@ -112,6 +112,11 @@ export type Transaction = {
   authorization_list?: Array<TxAuthorization>;
   // Interop
   op_interop_messages?: Array<InteropTransactionInfo>;
+  // Internal transaction value flow (for address page transactions)
+  internal_value_flow?: {
+    'in': string;
+    out: string;
+  };
 };
 
 type ArbitrumTransactionData = {
