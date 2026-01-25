@@ -1,8 +1,42 @@
-// Stablecoins with fixed USD prices
-// These tokens will always display the configured price instead of the API exchange_rate
-const STABLECOIN_PRICES: Record<string, string> = {
-  '0x6a850a548fdd050e8961223ec8FfCDfacEa57E39': '1.00',
-};
+import { ADDRESS } from '@juicedollar/jusd';
+
+import chain from 'configs/app/chain';
+
+const STABLECOIN_PRICE = '1.00';
+
+function getStablecoinAddresses(): Array<string> {
+  const chainId = Number(chain.id);
+  const addresses = ADDRESS[chainId];
+
+  if (!addresses) {
+    return [];
+  }
+
+  const stablecoins: Array<string> = [];
+
+  // JUSD stablecoin
+  if (addresses.juiceDollar && addresses.juiceDollar !== '0x0000000000000000000000000000000000000000') {
+    stablecoins.push(addresses.juiceDollar.toLowerCase());
+  }
+
+  // Underlying stablecoins
+  if (addresses.startUSD && addresses.startUSD !== '0x0000000000000000000000000000000000000000') {
+    stablecoins.push(addresses.startUSD.toLowerCase());
+  }
+  if (addresses.USDC && addresses.USDC !== '0x0000000000000000000000000000000000000000') {
+    stablecoins.push(addresses.USDC.toLowerCase());
+  }
+  if (addresses.USDT && addresses.USDT !== '0x0000000000000000000000000000000000000000') {
+    stablecoins.push(addresses.USDT.toLowerCase());
+  }
+  if (addresses.CTUSD && addresses.CTUSD !== '0x0000000000000000000000000000000000000000') {
+    stablecoins.push(addresses.CTUSD.toLowerCase());
+  }
+
+  return stablecoins;
+}
+
+const stablecoinAddresses = getStablecoinAddresses();
 
 export function getEffectiveExchangeRate(
   tokenAddress: string | undefined,
@@ -14,10 +48,8 @@ export function getEffectiveExchangeRate(
 
   const normalizedAddress = tokenAddress.toLowerCase();
 
-  for (const [ address, fixedPrice ] of Object.entries(STABLECOIN_PRICES)) {
-    if (address.toLowerCase() === normalizedAddress) {
-      return fixedPrice;
-    }
+  if (stablecoinAddresses.includes(normalizedAddress)) {
+    return STABLECOIN_PRICE;
   }
 
   return apiExchangeRate ?? null;
@@ -28,9 +60,5 @@ export function isStablecoin(tokenAddress: string | undefined): boolean {
     return false;
   }
 
-  const normalizedAddress = tokenAddress.toLowerCase();
-
-  return Object.keys(STABLECOIN_PRICES).some(
-    (address) => address.toLowerCase() === normalizedAddress,
-  );
+  return stablecoinAddresses.includes(tokenAddress.toLowerCase());
 }
