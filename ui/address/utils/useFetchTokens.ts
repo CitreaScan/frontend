@@ -117,19 +117,19 @@ export default function useFetchTokens({ hash, enabled }: Props) {
   const data = React.useMemo(() => {
     return {
       'ERC-20': {
-        items: erc20query.data?.items.map(calculateUsdValue) || [],
+        items: erc20query.data?.items.map((item) => calculateUsdValue(item)) || [],
         isOverflow: Boolean(erc20query.data?.next_page_params),
       },
       'ERC-721': {
-        items: erc721query.data?.items.map(calculateUsdValue) || [],
+        items: erc721query.data?.items.map((item) => calculateUsdValue(item)) || [],
         isOverflow: Boolean(erc721query.data?.next_page_params),
       },
       'ERC-1155': {
-        items: erc1155query.data?.items.map(calculateUsdValue) || [],
+        items: erc1155query.data?.items.map((item) => calculateUsdValue(item)) || [],
         isOverflow: Boolean(erc1155query.data?.next_page_params),
       },
       'ERC-404': {
-        items: erc404query.data?.items.map(calculateUsdValue) || [],
+        items: erc404query.data?.items.map((item) => calculateUsdValue(item)) || [],
         isOverflow: Boolean(erc1155query.data?.next_page_params),
       },
     };
