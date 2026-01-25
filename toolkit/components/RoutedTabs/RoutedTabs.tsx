@@ -10,6 +10,7 @@ import useActiveTabFromQuery from './useActiveTabFromQuery';
 interface Props extends AdaptiveTabsProps {
   preservedParams?: Array<string>;
   defaultTabId?: string;
+  tabListPosition?: 'top' | 'bottom';
 }
 
 const RoutedTabs = (props: Props) => {

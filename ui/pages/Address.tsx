@@ -172,11 +172,6 @@ const AddressPageContent = () => {
 
   const tabs: Array<TabItemRegular> = React.useMemo(() => {
     return [
-      {
-        id: 'index',
-        title: 'Details',
-        component: <AddressDetails addressQuery={ addressQuery } countersQuery={ countersQuery } isLoading={ isTabsLoading }/>,
-      },
       addressQuery.data?.is_contract ? {
         id: 'contract',
         title: () => {
@@ -308,7 +303,6 @@ const AddressPageContent = () => {
     ].filter(Boolean);
   }, [
     addressQuery,
-    countersQuery,
     addressTabsCountersQuery.data,
     userOpsAccountQuery.data,
     isTabsLoading,
@@ -470,7 +464,10 @@ const AddressPageContent = () => {
       { !addressMetadataQuery.isPending &&
         <AddressAlerts tags={ addressMetadataQuery.data?.addresses?.[hash.toLowerCase()]?.tags }/> }
       { config.features.metasuites.isEnabled && <Box display="none" id="meta-suites__address" data-ready={ !isLoading }/> }
-      <RoutedTabs tabs={ tabs } isLoading={ isTabsLoading }/>
+      <AddressDetails addressQuery={ addressQuery } countersQuery={ countersQuery } isLoading={ isTabsLoading }/>
+      <Box mt={ 6 }>
+        <RoutedTabs tabs={ tabs } isLoading={ isTabsLoading }/>
+      </Box>
     </>
   );
 };

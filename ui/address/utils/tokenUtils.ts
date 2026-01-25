@@ -5,6 +5,7 @@ import type { TokenType } from 'types/api/token';
 
 import config from 'configs/app';
 import sumBnReducer from 'lib/bigint/sumBnReducer';
+import { getEffectiveExchangeRate } from 'lib/token/stablecoins';
 import { ZERO } from 'toolkit/utils/consts';
 
 const celoFeature = config.features.celo;
@@ -81,12 +82,16 @@ export const filterTokens = (searchTerm: string) => ({ token }: AddressTokenBala
   return token.name?.toLowerCase().includes(searchTerm);
 };
 
-export const calculateUsdValue = (data: AddressTokenBalance): TokenEnhancedData => {
+export const calculateUsdValue = (data: AddressTokenBalance, nativeExchangeRate?: string | null): TokenEnhancedData => {
   if (data.token.type !== 'ERC-20') {
     return data;
   }
 
-  const exchangeRate = data.token.exchange_rate;
+  const exchangeRate = getEffectiveExchangeRate(
+    data.token.address_hash,
+    data.token.exchange_rate,
+    nativeExchangeRate,
+  );
   if (!exchangeRate) {
     return data;
   }
