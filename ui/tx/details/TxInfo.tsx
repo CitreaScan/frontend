@@ -2,7 +2,6 @@ import {
   Box,
   GridItem,
   Text,
-  Spinner,
   Flex,
   chakra,
   VStack,
@@ -31,6 +30,7 @@ import { Link } from 'toolkit/chakra/link';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import { Tooltip } from 'toolkit/chakra/tooltip';
 import { WEI, WEI_IN_GWEI } from 'toolkit/utils/consts';
+import CitreaSpinner from 'ui/shared/CitreaSpinner';
 import CopyToClipboard from 'ui/shared/CopyToClipboard';
 import CurrencyValue from 'ui/shared/CurrencyValue';
 import * as DetailedInfo from 'ui/shared/DetailedInfo/DetailedInfo';
@@ -169,7 +169,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
       </DetailedInfo.ItemLabel>
       <DetailedInfo.ItemValue multiRow={ config.features.externalTxs.isEnabled && externalTxsQuery.data && externalTxsQuery.data.length > 0 }>
         <Flex flexWrap="nowrap" alignItems="center" overflow="hidden">
-          { data.status === null && <Spinner mr={ 2 } size="sm" flexShrink={ 0 }/> }
+          { data.status === null && <Box mr={ 2 } flexShrink={ 0 }><CitreaSpinner size={ 20 }/></Box> }
           <Skeleton loading={ isLoading } overflow="hidden">
             <HashStringShortenDynamic hash={ data.hash }/>
           </Skeleton>
@@ -503,7 +503,26 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
         ) }
       </DetailedInfo.ItemValue>
 
-      { data.token_transfers && <TxDetailsTokenTransfers data={ data.token_transfers } txHash={ data.hash } isOverflow={ data.token_transfers_overflow }/> }
+      { data.token_transfers && data.status && (
+        <TxDetailsTokenTransfers
+          data={ data.token_transfers }
+          txHash={ data.hash }
+          isOverflow={ data.token_transfers_overflow }
+        />
+      ) }
+
+      { !data.status && (
+        <>
+          <DetailedInfo.ItemLabel
+            hint="List of tokens transferred in the transaction"
+          >
+            Tokens transferred
+          </DetailedInfo.ItemLabel>
+          <DetailedInfo.ItemValue>
+            <CitreaSpinner size={ 20 }/>
+          </DetailedInfo.ItemValue>
+        </>
+      ) }
 
       { hasInterop && data.op_interop_messages?.some(message => message.target_address_hash) && (
         <>
