@@ -1,3 +1,4 @@
+import { Box } from '@chakra-ui/react';
 import React from 'react';
 
 import type { TabsProps } from '../../chakra/tabs';
@@ -6,7 +7,9 @@ import { useViewportSize } from '../../hooks/useViewportSize';
 import AdaptiveTabsList, { type BaseProps as AdaptiveTabsListProps } from './AdaptiveTabsList';
 import { getTabValue } from './utils';
 
-export interface Props extends TabsProps, AdaptiveTabsListProps { }
+export interface Props extends TabsProps, AdaptiveTabsListProps {
+  tabListPosition?: 'top' | 'bottom';
+}
 
 const AdaptiveTabs = (props: Props) => {
   const {
@@ -22,6 +25,7 @@ const AdaptiveTabs = (props: Props) => {
     stickyEnabled,
     size,
     variant,
+    tabListPosition = 'top',
     ...rest
   } = props;
 
@@ -42,6 +46,36 @@ const AdaptiveTabs = (props: Props) => {
     }
   }, [ defaultValue ]);
 
+  const tabsList = (
+    <AdaptiveTabsList
+      // the easiest and most readable way to achieve correct tab's cut recalculation when
+      //    - screen is resized or
+      //    - tabs list is changed when API data is loaded
+      // is to do full re-render of the tabs list
+      // so we use screenWidth + tabIds as a key for the TabsList component
+      key={ isLoading + '_' + viewportSize.width + '_' + tabs.map((tab) => tab.id).join(':') }
+      tabs={ tabs }
+      listProps={ listProps }
+      leftSlot={ leftSlot }
+      leftSlotProps={ leftSlotProps }
+      rightSlot={ rightSlot }
+      rightSlotProps={ rightSlotProps }
+      stickyEnabled={ stickyEnabled }
+      activeTab={ activeTab }
+      isLoading={ isLoading }
+      variant={ variant }
+    />
+  );
+
+  const tabsContent = tabs.map((tab) => {
+    const value = getTabValue(tab);
+    return (
+      <TabsContent padding={ 0 } key={ value } value={ value }>
+        { tab.component }
+      </TabsContent>
+    );
+  });
+
   return (
     <TabsRoot
       position="relative"
@@ -51,32 +85,19 @@ const AdaptiveTabs = (props: Props) => {
       variant={ variant }
       { ...rest }
     >
-      <AdaptiveTabsList
-      // the easiest and most readable way to achieve correct tab's cut recalculation when
-        //    - screen is resized or
-        //    - tabs list is changed when API data is loaded
-        // is to do full re-render of the tabs list
-        // so we use screenWidth + tabIds as a key for the TabsList component
-        key={ isLoading + '_' + viewportSize.width + '_' + tabs.map((tab) => tab.id).join(':') }
-        tabs={ tabs }
-        listProps={ listProps }
-        leftSlot={ leftSlot }
-        leftSlotProps={ leftSlotProps }
-        rightSlot={ rightSlot }
-        rightSlotProps={ rightSlotProps }
-        stickyEnabled={ stickyEnabled }
-        activeTab={ activeTab }
-        isLoading={ isLoading }
-        variant={ variant }
-      />
-      { tabs.map((tab) => {
-        const value = getTabValue(tab);
-        return (
-          <TabsContent padding={ 0 } key={ value } value={ value }>
-            { tab.component }
-          </TabsContent>
-        );
-      }) }
+      { tabListPosition === 'top' ? (
+        <>
+          { tabsList }
+          { tabsContent }
+        </>
+      ) : (
+        <>
+          { tabsContent }
+          <Box mt={ 6 }>
+            { tabsList }
+          </Box>
+        </>
+      ) }
     </TabsRoot>
   );
 };
