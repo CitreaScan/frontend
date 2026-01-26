@@ -166,7 +166,8 @@ const TokenPageTitle = ({ tokenQuery, addressQuery, hash }: Props) => {
       />
     );
 
-    if (launchpadData?.launchpadUrl) {
+    // Only show link if we're using the launchpad image (token has no own icon_url)
+    if (launchpadData?.launchpadUrl && !tokenQuery.data?.icon_url) {
       return (
         <Link href={ launchpadData.launchpadUrl } target="_blank" rel="noopener noreferrer">
           { icon }
@@ -175,7 +176,7 @@ const TokenPageTitle = ({ tokenQuery, addressQuery, hash }: Props) => {
     }
 
     return icon;
-  }, [ tokenWithImage, tokenQuery.isPlaceholderData, multichainContext?.chain, launchpadData?.launchpadUrl ]);
+  }, [ tokenWithImage, tokenQuery.data?.icon_url, tokenQuery.isPlaceholderData, multichainContext?.chain, launchpadData?.launchpadUrl ]);
 
   return (
     <>
