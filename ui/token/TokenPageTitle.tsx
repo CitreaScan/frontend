@@ -12,6 +12,8 @@ import type { ResourceError } from 'lib/api/resources';
 import useApiQuery from 'lib/api/useApiQuery';
 import { useMultichainContext } from 'lib/contexts/multichain';
 import { getTokenTypeName } from 'lib/token/tokenTypes';
+import { useLaunchpadTokenImage } from 'lib/token/useLaunchpadTokenImage';
+import { Link } from 'toolkit/chakra/link';
 import { Tooltip } from 'toolkit/chakra/tooltip';
 import AddressAlerts from 'ui/address/details/AddressAlerts';
 import AddressQrCode from 'ui/address/details/AddressQrCode';
@@ -44,6 +46,27 @@ const TokenPageTitle = ({ tokenQuery, addressQuery, hash }: Props) => {
     pathParams: { hash: addressHash, chainId: config.chain.id },
     queryOptions: { enabled: Boolean(tokenQuery.data) && !tokenQuery.isPlaceholderData && config.features.verifiedTokens.isEnabled },
   });
+
+  // Fetch launchpad token data - always fetch, we'll use it only if no icon_url
+  const launchpadQuery = useLaunchpadTokenImage(hash);
+  const launchpadData = launchpadQuery.data;
+
+  // Token with launchpad image fallback
+  const tokenWithImage = React.useMemo(() => {
+    if (!tokenQuery.data) {
+      return undefined;
+    }
+    if (tokenQuery.data.icon_url) {
+      return tokenQuery.data;
+    }
+    if (launchpadData?.imageUrl) {
+      return {
+        ...tokenQuery.data,
+        icon_url: launchpadData.imageUrl,
+      };
+    }
+    return tokenQuery.data;
+  }, [ tokenQuery.data, launchpadData?.imageUrl ]);
 
   const addressesForMetadataQuery = React.useMemo(() => ([ hash ].filter(Boolean)), [ hash ]);
   const addressMetadataQuery = useAddressMetadataInfoQuery(addressesForMetadataQuery);
@@ -119,7 +142,7 @@ const TokenPageTitle = ({ tokenQuery, addressQuery, hash }: Props) => {
           } : undefined }
         />
       ) }
-      { !isLoading && tokenQuery.data && <AddressAddToWallet token={ tokenQuery.data } variant="button"/> }
+      { !isLoading && tokenWithImage && <AddressAddToWallet token={ tokenWithImage } variant="button"/> }
       { addressQuery.data && <AddressQrCode hash={ addressQuery.data.hash } isLoading={ isLoading }/> }
       <AccountActionsMenu isLoading={ isLoading }/>
       <Flex ml={{ base: 0, lg: 'auto' }} columnGap={ 2 } flexGrow={{ base: 1, lg: 0 }}>
@@ -129,19 +152,37 @@ const TokenPageTitle = ({ tokenQuery, addressQuery, hash }: Props) => {
     </Flex>
   );
 
+  const tokenIconElement = React.useMemo(() => {
+    if (!tokenWithImage) {
+      return null;
+    }
+
+    const icon = (
+      <TokenEntity.Icon
+        token={ tokenWithImage }
+        isLoading={ tokenQuery.isPlaceholderData }
+        variant="heading"
+        chain={ multichainContext?.chain }
+      />
+    );
+
+    if (launchpadData?.launchpadUrl) {
+      return (
+        <Link href={ launchpadData.launchpadUrl } target="_blank" rel="noopener noreferrer">
+          { icon }
+        </Link>
+      );
+    }
+
+    return icon;
+  }, [ tokenWithImage, tokenQuery.isPlaceholderData, multichainContext?.chain, launchpadData?.launchpadUrl ]);
+
   return (
     <>
       <PageTitle
         title={ `${ tokenQuery.data?.name || 'Unnamed token' }${ tokenSymbolText }` }
         isLoading={ tokenQuery.isPlaceholderData }
-        beforeTitle={ tokenQuery.data ? (
-          <TokenEntity.Icon
-            token={ tokenQuery.data }
-            isLoading={ tokenQuery.isPlaceholderData }
-            variant="heading"
-            chain={ multichainContext?.chain }
-          />
-        ) : null }
+        beforeTitle={ tokenIconElement }
         contentAfter={ contentAfter }
         secondRow={ secondRow }
       />
