@@ -6,6 +6,7 @@ import type { AdvancedFilterResponseItem } from 'types/api/advancedFilter';
 import config from 'configs/app';
 import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import { Badge } from 'toolkit/chakra/badge';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import type { ColumnsIds } from 'ui/advancedFilter/constants';
@@ -24,6 +25,7 @@ type Props = {
 };
 
 const ItemByColumn = ({ item, column, isLoading }: Props) => {
+  useTokenPrices();
   const statsQuery = useApiQuery('general:stats', {
     queryOptions: { refetchOnMount: false },
   });
