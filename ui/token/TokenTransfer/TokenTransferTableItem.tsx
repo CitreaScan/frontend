@@ -6,6 +6,7 @@ import type { TokenTransfer } from 'types/api/tokenTransfer';
 
 import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import { NFT_TOKEN_TYPE_IDS } from 'lib/token/tokenTypes';
 import { Badge } from 'toolkit/chakra/badge';
 import { Skeleton } from 'toolkit/chakra/skeleton';
@@ -29,6 +30,7 @@ const TokenTransferTableItem = ({
   isLoading,
   instance,
 }: Props) => {
+  useTokenPrices();
   const statsQuery = useApiQuery('general:stats', {
     queryOptions: { refetchOnMount: false },
   });

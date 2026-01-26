@@ -5,6 +5,7 @@ import type { TokenInfo } from 'types/api/token';
 
 import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import TokenEntity from 'ui/shared/entities/token/TokenEntity';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
   decimals: string | null;
 }
 const FtTokenTransferSnippet = ({ token, value, decimals }: Props) => {
+  useTokenPrices();
   const statsQuery = useApiQuery('general:stats', {
     queryOptions: { refetchOnMount: false },
   });

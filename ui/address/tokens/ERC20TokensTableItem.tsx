@@ -7,6 +7,7 @@ import config from 'configs/app';
 import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
 import { getEffectiveExchangeRate } from 'lib/token/stablecoins';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import { TableCell, TableRow } from 'toolkit/chakra/table';
 import AddressAddToWallet from 'ui/shared/address/AddressAddToWallet';
@@ -23,6 +24,7 @@ const ERC20TokensTableItem = ({
   value,
   isLoading,
 }: Props) => {
+  useTokenPrices();
   const statsQuery = useApiQuery('general:stats', {
     queryOptions: { refetchOnMount: false },
   });

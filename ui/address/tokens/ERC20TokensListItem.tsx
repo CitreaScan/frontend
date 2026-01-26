@@ -7,6 +7,7 @@ import config from 'configs/app';
 import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
 import { getEffectiveExchangeRate } from 'lib/token/stablecoins';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import AddressAddToWallet from 'ui/shared/address/AddressAddToWallet';
 import NativeTokenTag from 'ui/shared/celo/NativeTokenTag';
@@ -19,6 +20,7 @@ const celoFeature = config.features.celo;
 type Props = AddressTokenBalance & { isLoading: boolean };
 
 const ERC20TokensListItem = ({ token, value, isLoading }: Props) => {
+  useTokenPrices();
   const statsQuery = useApiQuery('general:stats', {
     queryOptions: { refetchOnMount: false },
   });
