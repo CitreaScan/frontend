@@ -25,7 +25,10 @@ const TokenBalances = () => {
     queryOptions: { enabled: Boolean(hash), refetchOnMount: false },
   });
 
-  const tokenQuery = useFetchTokens({ hash });
+  const tokenQuery = useFetchTokens({
+    hash,
+    nativeExchangeRate: addressQuery.data?.exchange_rate,
+  });
 
   if (addressQuery.isError || tokenQuery.isError) {
     return <DataFetchAlert/>;

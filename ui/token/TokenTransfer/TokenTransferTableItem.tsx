@@ -4,7 +4,9 @@ import React from 'react';
 import type { TokenInstance } from 'types/api/token';
 import type { TokenTransfer } from 'types/api/tokenTransfer';
 
+import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import { NFT_TOKEN_TYPE_IDS } from 'lib/token/tokenTypes';
 import { Badge } from 'toolkit/chakra/badge';
 import { Skeleton } from 'toolkit/chakra/skeleton';
@@ -28,12 +30,20 @@ const TokenTransferTableItem = ({
   isLoading,
   instance,
 }: Props) => {
+  useTokenPrices();
+  const statsQuery = useApiQuery('general:stats', {
+    queryOptions: { refetchOnMount: false },
+  });
+  const nativeExchangeRate = statsQuery.data?.coin_price;
+
   const { usd, valueStr } = total && 'value' in total && total.value !== null ? getCurrencyValue({
     value: total.value,
     exchangeRate: token?.exchange_rate,
     accuracy: 8,
     accuracyUsd: 2,
     decimals: total.decimals || '0',
+    tokenAddress: token?.address_hash,
+    nativeExchangeRate,
   }) : { usd: null, valueStr: null };
 
   return (

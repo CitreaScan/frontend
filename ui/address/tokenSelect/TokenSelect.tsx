@@ -34,7 +34,10 @@ const TokenSelect = () => {
 
   const addressQueryData = queryClient.getQueryData<Address>(addressResourceKey);
 
-  const { data, isError, isPending } = useFetchTokens({ hash: addressQueryData?.hash });
+  const { data, isError, isPending } = useFetchTokens({
+    hash: addressQueryData?.hash,
+    nativeExchangeRate: addressQueryData?.exchange_rate,
+  });
   const tokensResourceKey = getResourceKey('general:address_tokens', {
     pathParams: { hash: addressQueryData?.hash },
     queryParams: { type: 'ERC-20' },

@@ -4,7 +4,9 @@ import React from 'react';
 import type { AdvancedFilterResponseItem } from 'types/api/advancedFilter';
 
 import config from 'configs/app';
+import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import { Badge } from 'toolkit/chakra/badge';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import type { ColumnsIds } from 'ui/advancedFilter/constants';
@@ -23,6 +25,12 @@ type Props = {
 };
 
 const ItemByColumn = ({ item, column, isLoading }: Props) => {
+  useTokenPrices();
+  const statsQuery = useApiQuery('general:stats', {
+    queryOptions: { refetchOnMount: false },
+  });
+  const nativeExchangeRate = statsQuery.data?.coin_price;
+
   switch (column) {
     case 'tx_hash':
       return <TxEntity truncation="constant_long" hash={ item.hash } isLoading={ isLoading } noIcon fontWeight={ 700 }/>;
@@ -68,14 +76,24 @@ const ItemByColumn = ({ item, column, isLoading }: Props) => {
       if (item.total) {
         return (
           <Skeleton loading={ isLoading }>
-            { getCurrencyValue({ value: item.total?.value, decimals: item.total.decimals, accuracy: 8 }).valueStr }
+            { getCurrencyValue({
+              value: item.total?.value,
+              decimals: item.total.decimals,
+              accuracy: 8,
+              tokenAddress: item.token?.address_hash,
+              nativeExchangeRate,
+            }).valueStr }
           </Skeleton>
         );
       }
       if (item.value) {
         return (
           <Skeleton loading={ isLoading }>
-            { getCurrencyValue({ value: item.value, decimals: config.chain.currency.decimals.toString(), accuracy: 8 }).valueStr }
+            { getCurrencyValue({
+              value: item.value,
+              decimals: config.chain.currency.decimals.toString(),
+              accuracy: 8,
+            }).valueStr }
           </Skeleton>
         );
       }

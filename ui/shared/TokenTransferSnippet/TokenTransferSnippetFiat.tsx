@@ -3,7 +3,9 @@ import React from 'react';
 
 import type { TokenInfo } from 'types/api/token';
 
+import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import TokenEntity from 'ui/shared/entities/token/TokenEntity';
 
 interface Props {
@@ -12,11 +14,19 @@ interface Props {
   decimals: string | null;
 }
 const FtTokenTransferSnippet = ({ token, value, decimals }: Props) => {
+  useTokenPrices();
+  const statsQuery = useApiQuery('general:stats', {
+    queryOptions: { refetchOnMount: false },
+  });
+  const nativeExchangeRate = statsQuery.data?.coin_price;
+
   const { valueStr, usd } = getCurrencyValue({
     value: value,
     exchangeRate: token.exchange_rate,
     accuracyUsd: 2,
     decimals: decimals,
+    tokenAddress: token.address_hash,
+    nativeExchangeRate,
   });
 
   return (
