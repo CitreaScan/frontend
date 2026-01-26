@@ -3619,10 +3619,10 @@
   resolved "https://registry.yarnpkg.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
 
-"@juicedollar/jusd@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@juicedollar/jusd/-/jusd-1.1.0.tgz#0f85fd081873ebb90854bd76bb29aeca1272239e"
-  integrity sha512-+rMzg1bFgtUJRloEUFJDWBbb+0AUNOFwKS2Qc7JMP14Ngu1VhvAs00pBqC1O+OjQu7cc1twU7VS7W1XhVnYdMw==
+"@juicedollar/jusd@^3.0.0":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@juicedollar/jusd/-/jusd-3.0.1.tgz#4b0a0fe8dc7ce0629b600c052ff6cb5d75bc2109"
+  integrity sha512-Vx7baRj8q7ucF9T4WGDhBlp76wiKu6cS9H/WH64xu/iHnetZynDKn9T9uOQn4ABkhTeXBs24OA59LgWYe+cERA==
   dependencies:
     "@openzeppelin/contracts" "^5.1.0"
     hardhat-abi-exporter "^2.10.0"
@@ -3634,10 +3634,10 @@
     ts-node "^10.9.1"
     typescript "^5.2.2"
 
-"@juiceswapxyz/sdk-core@^0.1.11-beta.0":
-  version "0.1.11-beta.0"
-  resolved "https://registry.yarnpkg.com/@juiceswapxyz/sdk-core/-/sdk-core-0.1.11-beta.0.tgz#c556e4302aabecb213e79f6292933352eb446309"
-  integrity sha512-TrWsMT21mzskau1WjiBwXfLvBcDPWr4SHCvTBfvp7tec9rwgPeyfAKq1cc9L4TncFGcSegZM2Fkpcpe66B6pkA==
+"@juiceswapxyz/sdk-core@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@juiceswapxyz/sdk-core/-/sdk-core-3.0.2.tgz#2afd094fa5d1611ffe7ca961129f3f29878b7f01"
+  integrity sha512-rQ/OJszvdba0RQPd//xukNkaygTbb2uQPufVkdJ+75LCHbHUDsgByoBJIiqe/jfhxz5w4oewZtJDceO5xUkwKw==
   dependencies:
     "@ethersproject/address" "^5.0.2"
     "@ethersproject/bytes" "^5.7.0"
