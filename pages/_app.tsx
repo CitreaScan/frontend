@@ -18,6 +18,7 @@ import { initGrowthBook } from 'lib/growthbook/init';
 import useLoadFeatures from 'lib/growthbook/useLoadFeatures';
 import { clientConfig as rollbarConfig, Provider as RollbarProvider } from 'lib/rollbar';
 import { SocketProvider } from 'lib/socket/context';
+import { TokenPricesInitializer } from 'lib/token/TokenPricesInitializer';
 import { Provider as ChakraProvider } from 'toolkit/chakra/provider';
 import { Toaster } from 'toolkit/chakra/toaster';
 import RewardsLoginModal from 'ui/rewards/login/RewardsLoginModal';
@@ -97,6 +98,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 </GrowthBookProvider>
                 <ReactQueryDevtools buttonPosition="bottom-left" position="left"/>
                 <GoogleAnalytics/>
+                <TokenPricesInitializer/>
               </QueryClientProvider>
             </AppContextProvider>
           </Web3ModalProvider>
