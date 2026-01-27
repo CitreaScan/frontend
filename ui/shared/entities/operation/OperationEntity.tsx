@@ -1,10 +1,11 @@
-import { Spinner, chakra } from '@chakra-ui/react';
+import { chakra } from '@chakra-ui/react';
 import React from 'react';
 
 import * as tac from '@blockscout/tac-operation-lifecycle-types';
 
 import { route } from 'nextjs-routes';
 
+import CitreaSpinner from 'ui/shared/CitreaSpinner';
 import * as EntityBase from 'ui/shared/entities/base/components';
 
 import { distributeEntityProps } from '../base/utils';
@@ -29,7 +30,7 @@ type IconProps = EntityBase.IconBaseProps & Pick<EntityProps, 'type'>;
 const Icon = (props: IconProps) => {
   switch (props.type) {
     case tac.OperationType.PENDING: {
-      return <Spinner size="md" marginRight={ props.marginRight ?? '8px' }/>;
+      return <CitreaSpinner size={ 24 } marginRight={ props.marginRight ?? '8px' } flexShrink={ 0 }/>;
     }
     default: {
       return (
