@@ -1,6 +1,12 @@
 import chain from 'configs/app/chain';
 
-import { STABLECOIN_ADDRESSES, WRAPPED_NATIVE_ADDRESSES, VAULT_TOKEN_ADDRESSES, EQUITY_TOKEN_ADDRESSES } from './stablecoin-addresses.generated';
+import {
+  STABLECOIN_ADDRESSES,
+  WRAPPED_NATIVE_ADDRESSES,
+  VAULT_TOKEN_ADDRESSES,
+  EQUITY_TOKEN_ADDRESSES,
+  BTC_PEGGED_ADDRESSES,
+} from './stablecoin-addresses.generated';
 
 const STABLECOIN_PRICE = '1.00';
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
@@ -41,10 +47,18 @@ function getEquityTokenAddressesForChain(): Set<string> {
   return new Set(addresses ?? []);
 }
 
+function getBtcPeggedAddressesForChain(): Set<string> {
+  const chainId = String(chain.id);
+  const addresses = BTC_PEGGED_ADDRESSES[chainId];
+
+  return new Set(addresses ?? []);
+}
+
 const stablecoinAddresses = getStablecoinAddressesForChain();
 const wrappedNativeAddress = getWrappedNativeAddressForChain();
 const vaultTokenAddresses = getVaultTokenAddressesForChain();
 const equityTokenAddresses = getEquityTokenAddressesForChain();
+const btcPeggedAddresses = getBtcPeggedAddressesForChain();
 
 export function getEffectiveExchangeRate(
   tokenAddress: string | undefined,
@@ -64,6 +78,11 @@ export function getEffectiveExchangeRate(
 
   // Wrapped native tokens (e.g., WcBTC) use native currency exchange rate
   if (wrappedNativeAddress && normalizedAddress === wrappedNativeAddress) {
+    return nativeExchangeRate ?? apiExchangeRate ?? null;
+  }
+
+  // BTC-pegged tokens (e.g., syBTC) use native currency exchange rate
+  if (btcPeggedAddresses.has(normalizedAddress)) {
     return nativeExchangeRate ?? apiExchangeRate ?? null;
   }
 
@@ -108,6 +127,14 @@ export function isVaultToken(tokenAddress: string | undefined): boolean {
   }
 
   return vaultTokenAddresses.has(tokenAddress.toLowerCase());
+}
+
+export function isBtcPegged(tokenAddress: string | undefined): boolean {
+  if (!tokenAddress) {
+    return false;
+  }
+
+  return btcPeggedAddresses.has(tokenAddress.toLowerCase());
 }
 
 export function getCachedVaultPrice(tokenAddress: string): string | null {

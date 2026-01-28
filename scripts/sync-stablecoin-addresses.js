@@ -24,6 +24,24 @@ const SUPPORTED_CHAIN_IDS = [ '4114', '5115' ]; // Citrea Mainnet, Citrea Testne
 // Stablecoin token keys to extract
 const STABLECOIN_KEYS = [ 'juiceDollar', 'startUSD', 'USDC', 'USDT', 'CTUSD' ];
 
+// BTC-pegged token addresses (hardcoded, not from packages)
+// These tokens use the native BTC exchange rate (same as wrapped native)
+const BTC_PEGGED_ADDRESSES = {
+  '4114': [
+    '0x384157027b1cdeac4e26e3709667bb28735379bb', // syBTC (Symbiosis)
+  ],
+  '5115': [],
+};
+
+// Additional stablecoin addresses (hardcoded, not from packages)
+// These tokens will display a fixed price of $1.00
+const ADDITIONAL_STABLECOIN_ADDRESSES = {
+  '4114': [
+    '0x0987d3720d38847ac6dbb9d025b9de892a3ca35c', // JUSD (Juice Dollar)
+  ],
+  '5115': [],
+};
+
 // Vault token keys to extract (ERC-4626 vaults with stablecoin underlying)
 const VAULT_TOKEN_KEYS = [ 'savingsVaultJUSD' ];
 
@@ -51,6 +69,14 @@ function extractStablecoinAddresses() {
     for (const key of STABLECOIN_KEYS) {
       const addr = addresses[key];
       if (addr && addr !== ZERO_ADDRESS) {
+        stablecoins.push(addr.toLowerCase());
+      }
+    }
+
+    // Add hardcoded additional stablecoins
+    const additionalAddrs = ADDITIONAL_STABLECOIN_ADDRESSES[chainId] || [];
+    for (const addr of additionalAddrs) {
+      if (!stablecoins.includes(addr.toLowerCase())) {
         stablecoins.push(addr.toLowerCase());
       }
     }
@@ -151,7 +177,20 @@ function extractWrappedNativeAddresses() {
   return result;
 }
 
-function generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTokenAddresses, equityTokenAddresses) {
+function extractBtcPeggedAddresses() {
+  const result = {};
+
+  for (const chainId of SUPPORTED_CHAIN_IDS) {
+    const addresses = BTC_PEGGED_ADDRESSES[chainId];
+    if (addresses && addresses.length > 0) {
+      result[chainId] = addresses.map((addr) => addr.toLowerCase());
+    }
+  }
+
+  return result;
+}
+
+function generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTokenAddresses, equityTokenAddresses, btcPeggedAddresses) {
   const timestamp = new Date().toISOString();
 
   // Format stablecoin addresses object with proper indentation and single quotes
@@ -177,6 +216,14 @@ function generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTo
 
   // Format equity token addresses object
   const formattedEquityTokens = Object.entries(equityTokenAddresses)
+    .map(([ chainId, addrs ]) => {
+      const addrLines = addrs.map((addr) => `    '${ addr }',`).join('\n');
+      return `  '${ chainId }': [\n${ addrLines }\n  ],`;
+    })
+    .join('\n');
+
+  // Format BTC-pegged token addresses object
+  const formattedBtcPegged = Object.entries(btcPeggedAddresses)
     .map(([ chainId, addrs ]) => {
       const addrLines = addrs.map((addr) => `    '${ addr }',`).join('\n');
       return `  '${ chainId }': [\n${ addrLines }\n  ],`;
@@ -220,6 +267,14 @@ ${ formattedVaultTokens }
 export const EQUITY_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
 ${ formattedEquityTokens }
 };
+
+/**
+ * BTC-pegged token addresses by chain ID (e.g., syBTC).
+ * These tokens use the native BTC exchange rate (same as wrapped native).
+ */
+export const BTC_PEGGED_ADDRESSES: Record<string, ReadonlyArray<string>> = {
+${ formattedBtcPegged }
+};
 `;
 }
 
@@ -236,7 +291,10 @@ function main() {
   console.log('Extracting equity token addresses from @juicedollar/jusd...');
   const equityTokenAddresses = extractEquityTokenAddresses();
 
-  const content = generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTokenAddresses, equityTokenAddresses);
+  console.log('Extracting BTC-pegged token addresses from hardcoded list...');
+  const btcPeggedAddresses = extractBtcPeggedAddresses();
+
+  const content = generateTypeScript(stablecoinAddresses, wrappedNativeAddresses, vaultTokenAddresses, equityTokenAddresses, btcPeggedAddresses);
 
   // Check if file exists and content is different
   let hasChanges = true;
@@ -254,6 +312,7 @@ function main() {
     console.log('Wrapped native addresses:', JSON.stringify(wrappedNativeAddresses, null, 2));
     console.log('Vault token addresses:', JSON.stringify(vaultTokenAddresses, null, 2));
     console.log('Equity token addresses:', JSON.stringify(equityTokenAddresses, null, 2));
+    console.log('BTC-pegged addresses:', JSON.stringify(btcPeggedAddresses, null, 2));
     process.exit(0);
   } else {
     console.log('No changes detected.');
