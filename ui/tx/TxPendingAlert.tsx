@@ -1,11 +1,11 @@
-import { Spinner } from '@chakra-ui/react';
 import React from 'react';
 
 import { Alert } from 'toolkit/chakra/alert';
+import CitreaSpinner from 'ui/shared/CitreaSpinner';
 
 const TxPendingAlert = () => {
   return (
-    <Alert startElement={ <Spinner size="sm" my={ 1 }/> }>
+    <Alert startElement={ <CitreaSpinner size={ 20 } my={ 1 } flexShrink={ 0 }/> }>
       This transaction is pending confirmation.
     </Alert>
   );

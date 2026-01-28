@@ -1,4 +1,4 @@
-import { Spinner, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 import React from 'react';
 
 import type * as multichain from '@blockscout/multichain-aggregator-types';
@@ -14,6 +14,7 @@ import { Skeleton } from 'toolkit/chakra/skeleton';
 import { TableCell, TableRow } from 'toolkit/chakra/table';
 import CrossChainTxStatusTag from 'ui/optimismSuperchain/components/CrossChainTxStatusTag';
 import AddressFromTo from 'ui/shared/address/AddressFromTo';
+import CitreaSpinner from 'ui/shared/CitreaSpinner';
 import TokenEntity from 'ui/shared/entities/token/TokenEntity';
 import TxEntity from 'ui/shared/entities/tx/TxEntity';
 import TimeWithTooltip from 'ui/shared/time/TimeWithTooltip';
@@ -79,7 +80,7 @@ const CrossChainTxsTableItem = ({ item, isLoading, animation, currencySymbol, cu
             minH="30px"
           />
         ) :
-          <Spinner size="md" my="5px"/>
+          <CitreaSpinner size={ 24 } my="5px" flexShrink={ 0 }/>
         }
       </TableCell>
       <TableCell>
@@ -92,7 +93,7 @@ const CrossChainTxsTableItem = ({ item, isLoading, animation, currencySymbol, cu
             minH="30px"
           />
         ) :
-          <Spinner size="md" my="5px"/>
+          <CitreaSpinner size={ 24 } my="5px" flexShrink={ 0 }/>
         }
       </TableCell>
       <TableCell>

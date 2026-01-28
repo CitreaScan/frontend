@@ -3,11 +3,12 @@
 import {
   Toaster as ChakraToaster,
   Portal,
-  Spinner,
   Stack,
   Toast,
   createToaster,
 } from '@chakra-ui/react';
+
+import CitreaSpinner from 'ui/shared/CitreaSpinner';
 
 import { SECOND } from '../utils/consts';
 import { CloseButton } from './close-button';
@@ -34,7 +35,7 @@ export const Toaster = () => {
           return (
             <Toast.Root width={{ md: 'sm' }}>
               { toast.type === 'loading' ? (
-                <Spinner size="sm" color="orange.500" my={ 1 }/>
+                <CitreaSpinner size={ 20 } my={ 1 } flexShrink={ 0 }/>
               ) : null }
               <Stack gap="0" flex="1" maxWidth="100%">
                 { toast.title && <Toast.Title>{ toast.title }</Toast.Title> }
