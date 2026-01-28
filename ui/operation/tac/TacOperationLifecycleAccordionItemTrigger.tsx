@@ -1,4 +1,4 @@
-import { Box, HStack, Spinner } from '@chakra-ui/react';
+import { Box, HStack } from '@chakra-ui/react';
 import React from 'react';
 
 import type * as tac from '@blockscout/tac-operation-lifecycle-types';
@@ -6,6 +6,7 @@ import type * as tac from '@blockscout/tac-operation-lifecycle-types';
 import { STATUS_LABELS } from 'lib/operations/tac';
 import { AccordionItemTrigger } from 'toolkit/chakra/accordion';
 import { Skeleton } from 'toolkit/chakra/skeleton';
+import CitreaSpinner from 'ui/shared/CitreaSpinner';
 import IconSvg from 'ui/shared/IconSvg';
 
 interface Props {
@@ -23,7 +24,7 @@ const TacOperationLifecycleAccordionItemTrigger = ({ status, isFirst, isLast, is
       case 'pending': {
         return (
           <HStack gap={ 2 }>
-            <Spinner size="md"/>
+            <CitreaSpinner size={ 24 } flexShrink={ 0 }/>
             <Box color="text.secondary">
               Pending
             </Box>
