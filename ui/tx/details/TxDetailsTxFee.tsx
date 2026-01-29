@@ -1,14 +1,15 @@
 import BigNumber from 'bignumber.js';
 import React from 'react';
+import type { Hash } from 'viem';
 
 import type { Transaction } from 'types/api/transaction';
 
 import config from 'configs/app';
 import { currencyUnits } from 'lib/units';
+import useCitreaL1Fee from 'lib/web3/useCitreaL1Fee';
 import CurrencyValue from 'ui/shared/CurrencyValue';
 import * as DetailedInfo from 'ui/shared/DetailedInfo/DetailedInfo';
 import * as DetailedInfoItemBreakdown from 'ui/shared/DetailedInfo/DetailedInfoItemBreakdown';
-import TxFee from 'ui/shared/tx/TxFee';
 
 interface Props {
   isLoading: boolean;
@@ -16,73 +17,82 @@ interface Props {
 }
 
 const TxDetailsTxFee = ({ isLoading, data }: Props) => {
+  const { l1Fee, isLoading: isL1FeeLoading } = useCitreaL1Fee(data.hash as Hash);
 
   if (config.UI.views.tx.hiddenFields?.tx_fee) {
     return null;
   }
 
+  const l2Fee = BigNumber(data.fee.value || 0);
+  const l1FeeBn = BigNumber(l1Fee || 0);
+  const totalFee = l2Fee.plus(l1FeeBn);
+  const hasL1Fee = l1Fee !== null && l1FeeBn.gt(0);
+  const combinedLoading = isLoading || isL1FeeLoading;
+
   const content = (() => {
-    if (!config.UI.views.tx.groupedFees) {
+    if (!config.UI.views.tx.groupedFees && !hasL1Fee) {
       return (
-        <TxFee
-          tx={ data }
-          isLoading={ isLoading }
-          withUsd
+        <CurrencyValue
+          value={ totalFee.toString() }
+          currency={ currencyUnits.ether }
+          exchangeRate={ 'exchange_rate' in data ? data.exchange_rate : null }
+          isLoading={ combinedLoading }
+          showGweiTooltip
+          flexWrap="wrap"
           rowGap={ 0 }
           accuracyUsd={ 2 }
         />
       );
     }
 
-    const baseFeeBn = BigNumber(data.base_fee_per_gas || 0).multipliedBy(data.gas_used || 0);
-    const priorityFeeBn = BigNumber(data.priority_fee || 0);
-
+    // Show breakdown when hasL1Fee or groupedFees is enabled
     return (
       <>
         <CurrencyValue
-          value={ data.fee.value }
+          value={ totalFee.toString() }
           currency={ currencyUnits.ether }
           exchangeRate={ 'exchange_rate' in data ? data.exchange_rate : null }
-          isLoading={ isLoading }
+          isLoading={ combinedLoading }
           showGweiTooltip
           flexWrap="wrap"
           mr={ 3 }
           rowGap={ 0 }
           accuracyUsd={ 2 }
         />
-        <DetailedInfoItemBreakdown.Container loading={ isLoading }>
+        <DetailedInfoItemBreakdown.Container loading={ combinedLoading }>
           <DetailedInfoItemBreakdown.Row
-            label="Base fee"
-            hint="The minimum network fee charged per transaction"
+            label="L2 execution fee"
+            hint="Fee for executing the transaction on L2"
           >
             <CurrencyValue
-              value={ baseFeeBn.toString() }
+              value={ l2Fee.toString() }
               currency={ currencyUnits.ether }
               exchangeRate={ 'exchange_rate' in data ? data.exchange_rate : null }
-              isLoading={ isLoading }
+              isLoading={ combinedLoading }
               showGweiTooltip
               flexWrap="wrap"
               rowGap={ 0 }
               accuracyUsd={ 2 }
             />
           </DetailedInfoItemBreakdown.Row>
-          <DetailedInfoItemBreakdown.Row
-            label="Priority fee"
-            hint="An extra fee set by the sender to speed up transaction execution"
-          >
-            <CurrencyValue
-              value={ priorityFeeBn.toString() }
-              currency={ currencyUnits.ether }
-              exchangeRate={ 'exchange_rate' in data ? data.exchange_rate : null }
-              isLoading={ isLoading }
-              showGweiTooltip
-              flexWrap="wrap"
-              rowGap={ 0 }
-              accuracyUsd={ 2 }
-            />
-          </DetailedInfoItemBreakdown.Row>
+          { hasL1Fee && (
+            <DetailedInfoItemBreakdown.Row
+              label="L1 data fee"
+              hint="Fee for posting transaction data to Bitcoin L1"
+            >
+              <CurrencyValue
+                value={ l1FeeBn.toString() }
+                currency={ currencyUnits.ether }
+                exchangeRate={ 'exchange_rate' in data ? data.exchange_rate : null }
+                isLoading={ combinedLoading }
+                showGweiTooltip
+                flexWrap="wrap"
+                rowGap={ 0 }
+                accuracyUsd={ 2 }
+              />
+            </DetailedInfoItemBreakdown.Row>
+          ) }
         </DetailedInfoItemBreakdown.Container>
-
       </>
     );
   })();
@@ -90,8 +100,8 @@ const TxDetailsTxFee = ({ isLoading, data }: Props) => {
   return (
     <>
       <DetailedInfo.ItemLabel
-        hint={ data.blob_gas_used ? 'Transaction fee without blob fee' : 'Total transaction fee' }
-        isLoading={ isLoading }
+        hint={ hasL1Fee ? 'Total fee including L2 execution and L1 data fee' : 'Total transaction fee' }
+        isLoading={ combinedLoading }
       >
         Transaction fee
       </DetailedInfo.ItemLabel>
