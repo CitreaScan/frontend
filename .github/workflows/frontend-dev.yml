@@ -50,13 +50,18 @@ jobs:
           inlineScript: |
             echo "Update docker container..."
 
-            CONTENT=$(base64 -w0 ./.env.dev)
+            CONTENT_DEV=$(base64 -w0 ./.env.dev)
+            CONTENT_PRD=$(base64 -w0 ./.env.prd)
 
             az vm run-command invoke \
               --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
               --name ${{ env.AZURE_VM_NAME }} \
               --command-id RunShellScript \
-              --scripts "echo $CONTENT | base64 -d > /home/dfx/docker-compose-blockscout-citrea-testnet.frontend.env && /home/dfx/update-blockscout.sh frontend"
+              --scripts "
+                echo $CONTENT_DEV | base64 -d > /home/dfx/docker-compose-blockscout-citrea-testnet.frontend.env &&
+                echo $CONTENT_PRD | base64 -d > /home/dfx/docker-compose-blockscout-citrea-mainnet.frontend.env &&
+                /home/dfx/update-blockscout.sh frontend
+              "
 
       - name: Purge Frontdoor endpoint
         uses: azure/CLI@v2
