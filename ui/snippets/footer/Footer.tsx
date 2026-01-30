@@ -40,7 +40,7 @@ const Footer = () => {
       icon: 'social/git' as const,
       iconSize: '18px',
       text: 'Contribute',
-      url: 'https://github.com/CitreaScan/blockscout',
+      url: 'https://github.com/CitreaScan/',
     },
     {
       icon: 'social/twitter' as const,
