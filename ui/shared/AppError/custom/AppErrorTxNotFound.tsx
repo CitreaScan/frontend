@@ -51,8 +51,8 @@ const AppErrorTxNotFound = () => {
       </Box>
       <AppErrorTitle title="Sorry, we are unable to locate this transaction hash"/>
       { hash && (
-        <Box mt={ 4 }>
-          <TxEntity hash={ hash } noLink noCopy={ false }/>
+        <Box mt={ 4 } w="fit-content">
+          <TxEntity hash={ hash } noLink noCopy={ false } truncation="none"/>
         </Box>
       ) }
       <List.Root mt={ 3 } gap={ 3 } as="ol" pl={ 5 }>

@@ -16,6 +16,7 @@ import RoutedTabs from 'toolkit/components/RoutedTabs/RoutedTabs';
 import TextAd from 'ui/shared/ad/TextAd';
 import AppErrorTxNotFound from 'ui/shared/AppError/custom/AppErrorTxNotFound';
 import isCustomAppError from 'ui/shared/AppError/isCustomAppError';
+import TxEntity from 'ui/shared/entities/tx/TxEntity';
 import EntityTags from 'ui/shared/EntityTags/EntityTags';
 import PageTitle from 'ui/shared/Page/PageTitle';
 import TxAssetFlows from 'ui/tx/TxAssetFlows';
@@ -178,7 +179,9 @@ const TransactionPageContent = () => {
     />
   );
 
-  const titleSecondRow = isSearching ? null : <TxSubHeading hash={ hash } hasTag={ Boolean(data?.transaction_tag) } txQuery={ txQuery }/>;
+  const titleSecondRow = isSearching ?
+    <TxEntity hash={ hash } noLink noCopy={ false }/> :
+    <TxSubHeading hash={ hash } hasTag={ Boolean(data?.transaction_tag) } txQuery={ txQuery }/>;
 
   if (isError && !showDegradedView && !isSearching) {
     if (isCustomAppError(error)) {
