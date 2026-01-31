@@ -1,16 +1,21 @@
 /* eslint-disable max-len */
 import { Box, Flex, List, chakra } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 import { route } from 'nextjs-routes';
 
+import getQueryParamString from 'lib/router/getQueryParamString';
 import { Button } from 'toolkit/chakra/button';
 import { Link } from 'toolkit/chakra/link';
 import Puzzle15 from 'ui/games/Puzzle15';
+import TxEntity from 'ui/shared/entities/tx/TxEntity';
 import IconSvg from 'ui/shared/IconSvg';
 
 import AppErrorTitle from '../AppErrorTitle';
 const AppErrorTxNotFound = () => {
+  const router = useRouter();
+  const hash = getQueryParamString(router.query.hash);
   const snippet = {
     borderColor: { _light: 'blackAlpha.300', _dark: 'whiteAlpha.300' },
     iconBg: { _light: 'blackAlpha.800', _dark: 'whiteAlpha.800' },
@@ -45,6 +50,11 @@ const AppErrorTxNotFound = () => {
         </Flex>
       </Box>
       <AppErrorTitle title="Sorry, we are unable to locate this transaction hash"/>
+      { hash && (
+        <Box mt={ 4 }>
+          <TxEntity hash={ hash } noLink noCopy={ false }/>
+        </Box>
+      ) }
       <List.Root mt={ 3 } gap={ 3 } as="ol" pl={ 5 }>
         <List.Item>
           If you have just submitted this transaction please wait for at least 30 seconds before refreshing this page.
