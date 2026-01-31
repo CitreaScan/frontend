@@ -11,6 +11,7 @@ import throwOnResourceLoadError from 'lib/errors/throwOnResourceLoadError';
 import getQueryParamString from 'lib/router/getQueryParamString';
 import useEtherscanRedirects from 'lib/router/useEtherscanRedirects';
 import { publicClient } from 'lib/web3/client';
+import { toaster } from 'toolkit/chakra/toaster';
 import RoutedTabs from 'toolkit/components/RoutedTabs/RoutedTabs';
 import TextAd from 'ui/shared/ad/TextAd';
 import AppErrorTxNotFound from 'ui/shared/AppError/custom/AppErrorTxNotFound';
@@ -94,6 +95,21 @@ const TransactionPageContent = () => {
       setIsSearching(false);
     }
   }, [ isSearching, isError, data, isPlaceholderData, txQuery ]);
+
+  // Show/hide toast during search
+  const SEARCH_TOAST_ID = 'tx-search-toast';
+  React.useEffect(() => {
+    if (isSearching) {
+      toaster.loading({
+        id: SEARCH_TOAST_ID,
+        title: 'Transaction pending...',
+        description: 'Waiting for confirmation',
+        duration: Infinity,
+      });
+    } else {
+      toaster.remove(SEARCH_TOAST_ID);
+    }
+  }, [ isSearching ]);
 
   const showDegradedView = publicClient && ((isError && error.status !== 422) || isPlaceholderData) && errorUpdateCount > 0 && !isSearching && !isError;
 
