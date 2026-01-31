@@ -84,6 +84,17 @@ const TransactionPageContent = () => {
     };
   }, [ hash ]);
 
+  // Stop searching when transaction is found
+  React.useEffect(() => {
+    if (isSearching && !isError && data && !isPlaceholderData) {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      txQuery.setRefetchEnabled(false);
+      setIsSearching(false);
+    }
+  }, [ isSearching, isError, data, isPlaceholderData, txQuery ]);
+
   const showDegradedView = publicClient && ((isError && error.status !== 422) || isPlaceholderData) && errorUpdateCount > 0 && !isSearching && !isError;
 
   const searchingComponent = React.useMemo(() => <TxSearching/>, []);
