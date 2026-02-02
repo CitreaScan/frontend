@@ -1,3 +1,4 @@
+import { Box } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -10,9 +11,12 @@ import throwOnResourceLoadError from 'lib/errors/throwOnResourceLoadError';
 import getQueryParamString from 'lib/router/getQueryParamString';
 import useEtherscanRedirects from 'lib/router/useEtherscanRedirects';
 import { publicClient } from 'lib/web3/client';
+import { toaster } from 'toolkit/chakra/toaster';
 import RoutedTabs from 'toolkit/components/RoutedTabs/RoutedTabs';
 import TextAd from 'ui/shared/ad/TextAd';
+import AppErrorTxNotFound from 'ui/shared/AppError/custom/AppErrorTxNotFound';
 import isCustomAppError from 'ui/shared/AppError/isCustomAppError';
+import TxEntity from 'ui/shared/entities/tx/TxEntity';
 import EntityTags from 'ui/shared/EntityTags/EntityTags';
 import PageTitle from 'ui/shared/Page/PageTitle';
 import TxAssetFlows from 'ui/tx/TxAssetFlows';
@@ -24,6 +28,7 @@ import TxDetailsWrapped from 'ui/tx/TxDetailsWrapped';
 import TxInternals from 'ui/tx/TxInternals';
 import TxLogs from 'ui/tx/TxLogs';
 import TxRawTrace from 'ui/tx/TxRawTrace';
+import TxSearching from 'ui/tx/TxSearching';
 import TxState from 'ui/tx/TxState';
 import TxSubHeading from 'ui/tx/TxSubHeading';
 import TxTokenTransfer from 'ui/tx/TxTokenTransfer';
@@ -36,7 +41,6 @@ const tacFeature = config.features.tac;
 
 const TransactionPageContent = () => {
   const router = useRouter();
-
   const hash = getQueryParamString(router.query.hash);
 
   useEtherscanRedirects();
@@ -52,12 +56,75 @@ const TransactionPageContent = () => {
 
   const { data, isPlaceholderData, isError, error, errorUpdateCount } = txQuery;
 
-  const showDegradedView = publicClient && ((isError && error.status !== 422) || isPlaceholderData) && errorUpdateCount > 0;
+  const [ isSearching, setIsSearching ] = React.useState(false);
+  const [ searchCompleted, setSearchCompleted ] = React.useState(false);
+  const searchAttemptedRef = React.useRef(false);
+  const searchTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const tabs: Array<TabItemRegular> = (() => {
-    const detailsComponent = showDegradedView ?
-      <TxDetailsDegraded hash={ hash } txQuery={ txQuery }/> :
-      <TxDetails txQuery={ txQuery } tacOperationQuery={ tacFeature.isEnabled ? tacOperationQuery : undefined }/>;
+  React.useEffect(() => {
+    if (isError && error && (error.status === 404 || error.status === 422) && !searchAttemptedRef.current) {
+      searchAttemptedRef.current = true;
+      setIsSearching(true);
+      setSearchCompleted(false);
+      txQuery.setRefetchEnabled(true);
+
+      searchTimeoutRef.current = setTimeout(() => {
+        txQuery.setRefetchEnabled(false);
+        setIsSearching(false);
+        setSearchCompleted(true);
+      }, 30000);
+    }
+  }, [ isError, error, hash, txQuery ]);
+
+  // Reset search state when hash changes
+  React.useEffect(() => {
+    return () => {
+      searchAttemptedRef.current = false;
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [ hash ]);
+
+  // Stop searching when transaction is found
+  React.useEffect(() => {
+    if (isSearching && !isError && data && !isPlaceholderData) {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+      txQuery.setRefetchEnabled(false);
+      setIsSearching(false);
+    }
+  }, [ isSearching, isError, data, isPlaceholderData, txQuery ]);
+
+  // Show/hide toast during search
+  const SEARCH_TOAST_ID = 'tx-search-toast';
+  React.useEffect(() => {
+    if (isSearching) {
+      toaster.loading({
+        id: SEARCH_TOAST_ID,
+        title: 'Transaction pending...',
+        description: 'Waiting for confirmation',
+        duration: Infinity,
+      });
+    } else {
+      toaster.remove(SEARCH_TOAST_ID);
+    }
+  }, [ isSearching ]);
+
+  const showDegradedView = publicClient && ((isError && error.status !== 422) || isPlaceholderData) && errorUpdateCount > 0 && !isSearching && !isError;
+
+  const searchingComponent = React.useMemo(() => <TxSearching/>, []);
+
+  const tabs: Array<TabItemRegular> = React.useMemo(() => {
+    let detailsComponent;
+    if (isSearching) {
+      detailsComponent = searchingComponent;
+    } else if (showDegradedView) {
+      detailsComponent = <TxDetailsDegraded hash={ hash } txQuery={ txQuery }/>;
+    } else {
+      detailsComponent = <TxDetails txQuery={ txQuery } tacOperationQuery={ tacFeature.isEnabled ? tacOperationQuery : undefined }/>;
+    }
 
     return [
       {
@@ -86,7 +153,7 @@ const TransactionPageContent = () => {
         { id: 'authorizations', title: 'Authorizations', component: <TxAuthorizations txQuery={ txQuery }/> } :
         undefined,
     ].filter(Boolean);
-  })();
+  }, [ isSearching, searchingComponent, showDegradedView, hash, txQuery, tacOperationQuery, data ]);
 
   const txTags: Array<TEntityTag> = data?.transaction_tag ?
     [ { slug: data.transaction_tag, name: data.transaction_tag, tagType: 'private_tag' as const, ordinal: 1 } ] : [];
@@ -112,11 +179,23 @@ const TransactionPageContent = () => {
     />
   );
 
-  const titleSecondRow = <TxSubHeading hash={ hash } hasTag={ Boolean(data?.transaction_tag) } txQuery={ txQuery }/>;
+  const titleSecondRow = isSearching ?
+    <TxEntity hash={ hash } noLink noCopy={ false }/> :
+    <TxSubHeading hash={ hash } hasTag={ Boolean(data?.transaction_tag) } txQuery={ txQuery }/>;
 
-  if (isError && !showDegradedView) {
+  if (isError && !showDegradedView && !isSearching) {
     if (isCustomAppError(error)) {
-      throwOnResourceLoadError({ resource: 'general:tx', error, isError: true });
+      if (error.status === 404 || error.status === 422) {
+        if (searchCompleted) {
+          return (
+            <Box mt={{ base: '52px', lg: '104px' }} maxW="800px">
+              <AppErrorTxNotFound/>
+            </Box>
+          );
+        }
+      } else {
+        throwOnResourceLoadError({ resource: 'general:tx', error, isError: true });
+      }
     }
   }
 
@@ -128,7 +207,7 @@ const TransactionPageContent = () => {
         contentAfter={ tags }
         secondRow={ titleSecondRow }
       />
-      <RoutedTabs tabs={ tabs } isLoading={ isPlaceholderData }/>
+      <RoutedTabs tabs={ tabs } isLoading={ isPlaceholderData && !isSearching }/>
     </>
   );
 };

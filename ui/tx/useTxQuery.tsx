@@ -31,7 +31,13 @@ interface Params {
 
 export default function useTxQuery(params?: Params): TxQuery {
   const [ socketStatus, setSocketStatus ] = React.useState<'close' | 'error'>();
-  const [ isRefetchEnabled, setRefetchEnabled ] = React.useState(false);
+  const isRefetchEnabledRef = React.useRef(false);
+  const [ , forceUpdate ] = React.useReducer(x => x + 1, 0);
+
+  const setRefetchEnabled = React.useCallback((value: boolean) => {
+    isRefetchEnabledRef.current = value;
+    forceUpdate();
+  }, []);
 
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -45,15 +51,16 @@ export default function useTxQuery(params?: Params): TxQuery {
       refetchOnMount: false,
       placeholderData: rollupFeature.isEnabled && rollupFeature.type === 'zkEvm' ? TX_ZKEVM_L2 : TX,
       retry: (failureCount, error) => {
-        if (isRefetchEnabled) {
+        if (isRefetchEnabledRef.current) {
           return false;
         }
 
         return retry(failureCount, error);
       },
       refetchInterval: (): number | false => {
-        return isRefetchEnabled ? 15 * SECOND : false;
+        return isRefetchEnabledRef.current ? 3 * SECOND : false;
       },
+      refetchIntervalInBackground: false,
     },
   });
   const { data, isError, isPlaceholderData, isPending } = queryResult;
