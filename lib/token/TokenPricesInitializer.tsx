@@ -1,5 +1,3 @@
-import useApiQuery from 'lib/api/useApiQuery';
-
 import { useBondingCurvePrices } from './useBondingCurvePrices';
 import { useEquityPrices } from './useEquityPrices';
 import { useLpPoolPrices } from './useLpPoolPrices';
@@ -17,16 +15,7 @@ export function useTokenPrices() {
   const { data: vaultPrices } = useVaultPrices();
   const { data: equityPrices } = useEquityPrices();
   const { data: lpPoolPrices } = useLpPoolPrices();
-
-  // Get native exchange rate for bonding curve price calculations
-  const statsQuery = useApiQuery('general:stats', {
-    queryOptions: { refetchOnMount: false },
-  });
-  const nativeExchangeRate = statsQuery.data?.coin_price ?
-    parseFloat(statsQuery.data.coin_price) :
-    undefined;
-
-  const { data: bondingCurvePrices } = useBondingCurvePrices(nativeExchangeRate);
+  const { data: bondingCurvePrices } = useBondingCurvePrices();
 
   // Version changes when prices load, triggering re-renders
   const version = (vaultPrices ? Object.keys(vaultPrices).length : 0) +

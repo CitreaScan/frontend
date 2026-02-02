@@ -21,7 +21,6 @@ interface RpcResponse {
 async function fetchBondingCurvePrice(
   tokenAddress: string,
   rpcUrl: string,
-  nativeExchangeRate: number,
 ): Promise<string> {
   // Fetch both reserves in parallel
   const [ baseResponse, tokenResponse ] = await Promise.all([
@@ -65,19 +64,16 @@ async function fetchBondingCurvePrice(
     throw new Error('Virtual token reserves is zero');
   }
 
-  // Price in BTC = virtualBaseReserves / virtualTokenReserves
-  // Both values are in 18 decimals, so the ratio gives us BTC per token
-  const priceInBtc = Number(virtualBaseReserves) / Number(virtualTokenReserves);
-
-  // Convert to USD using native exchange rate
-  const priceInUsd = priceInBtc * nativeExchangeRate;
+  // Price in USD = virtualBaseReserves / virtualTokenReserves
+  // The base token is a stablecoin (JUSD = $1), so the ratio gives us USD per token
+  // Both values are in 18 decimals, so they cancel out
+  const priceInUsd = Number(virtualBaseReserves) / Number(virtualTokenReserves);
 
   return priceInUsd.toFixed(8);
 }
 
 async function fetchAllBondingCurvePrices(
   rpcUrl: string,
-  nativeExchangeRate: number,
 ): Promise<Record<string, string>> {
   const chainId = String(config.chain.id);
   const tokenAddresses = BONDING_CURVE_TOKENS[chainId] ?? [];
@@ -87,7 +83,7 @@ async function fetchAllBondingCurvePrices(
   await Promise.all(
     tokenAddresses.map(async(address) => {
       try {
-        const price = await fetchBondingCurvePrice(address, rpcUrl, nativeExchangeRate);
+        const price = await fetchBondingCurvePrice(address, rpcUrl);
         const normalizedAddress = address.toLowerCase();
         prices[normalizedAddress] = price;
         setCachedBondingCurvePrice(address, price);
@@ -101,14 +97,14 @@ async function fetchAllBondingCurvePrices(
   return prices;
 }
 
-export function useBondingCurvePrices(nativeExchangeRate: number | undefined) {
+export function useBondingCurvePrices() {
   const rpcUrl = config.chain.rpcUrls?.[0];
 
   return useQuery({
-    queryKey: [ 'bonding-curve-prices', config.chain.id, nativeExchangeRate ],
-    queryFn: () => fetchAllBondingCurvePrices(rpcUrl ?? '', nativeExchangeRate ?? 0),
+    queryKey: [ 'bonding-curve-prices', config.chain.id ],
+    queryFn: () => fetchAllBondingCurvePrices(rpcUrl ?? ''),
     staleTime: BONDING_CURVE_PRICE_STALE_TIME,
     refetchInterval: BONDING_CURVE_PRICE_STALE_TIME,
-    enabled: Boolean(rpcUrl) && typeof nativeExchangeRate === 'number' && nativeExchangeRate > 0,
+    enabled: Boolean(rpcUrl),
   });
 }
