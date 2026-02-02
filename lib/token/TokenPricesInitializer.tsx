@@ -1,9 +1,12 @@
+import useApiQuery from 'lib/api/useApiQuery';
+
+import { useBondingCurvePrices } from './useBondingCurvePrices';
 import { useEquityPrices } from './useEquityPrices';
 import { useLpPoolPrices } from './useLpPoolPrices';
 import { useVaultPrices } from './useVaultPrices';
 
 /**
- * Hook that fetches and caches vault/equity/LP pool token prices.
+ * Hook that fetches and caches vault/equity/LP pool/bonding curve token prices.
  * Components using this hook will re-render when prices are loaded,
  * ensuring getCurrencyValue() has access to the cached prices.
  *
@@ -15,10 +18,21 @@ export function useTokenPrices() {
   const { data: equityPrices } = useEquityPrices();
   const { data: lpPoolPrices } = useLpPoolPrices();
 
+  // Get native exchange rate for bonding curve price calculations
+  const statsQuery = useApiQuery('general:stats', {
+    queryOptions: { refetchOnMount: false },
+  });
+  const nativeExchangeRate = statsQuery.data?.coin_price ?
+    parseFloat(statsQuery.data.coin_price) :
+    undefined;
+
+  const { data: bondingCurvePrices } = useBondingCurvePrices(nativeExchangeRate);
+
   // Version changes when prices load, triggering re-renders
   const version = (vaultPrices ? Object.keys(vaultPrices).length : 0) +
     (equityPrices ? Object.keys(equityPrices).length : 0) +
-    (lpPoolPrices ? Object.keys(lpPoolPrices).length : 0);
+    (lpPoolPrices ? Object.keys(lpPoolPrices).length : 0) +
+    (bondingCurvePrices ? Object.keys(bondingCurvePrices).length : 0);
 
   return { version };
 }
@@ -26,7 +40,8 @@ export function useTokenPrices() {
 /**
  * Global initializer component that fetches and caches token prices.
  * This ensures vault tokens (e.g., svJUSD), equity tokens (e.g., JUICE),
- * and LP pool tokens (e.g., TAPFREAK) have their prices available on all pages.
+ * LP pool tokens (e.g., TAPFREAK), and bonding curve tokens (e.g., THERESIA)
+ * have their prices available on all pages.
  *
  * Must be rendered inside QueryClientProvider.
  */
