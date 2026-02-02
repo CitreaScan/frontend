@@ -35,6 +35,9 @@ export const WRAPPED_NATIVE_ADDRESSES: Record<string, string> = {
  * The underlying asset is assumed to be a stablecoin worth $1.00.
  */
 export const VAULT_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
+  '4114': [
+    '0x1b70ae756b1089cc5948e4f8a2ad498df30e897d',
+  ],
   '5115': [
     '0x802a29bd29f02c8c477af5362f9ba88fae39cc7b',
   ],
