@@ -11,6 +11,7 @@ import {
 
 const STABLECOIN_PRICE = '1.00';
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+const LP_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes (shorter due to DEX volatility)
 
 interface PriceCacheEntry {
   price: string;
@@ -60,7 +61,8 @@ function getLpPoolTokenAddressesForChain(): Set<string> {
   const chainId = String(chain.id);
   const tokenConfigs = LP_POOL_PRICE_TOKENS[chainId];
 
-  return new Set(tokenConfigs ? Object.keys(tokenConfigs) : []);
+  // Normalize keys to lowercase for consistent matching
+  return new Set(tokenConfigs ? Object.keys(tokenConfigs).map(k => k.toLowerCase()) : []);
 }
 
 const stablecoinAddresses = getStablecoinAddressesForChain();
@@ -213,8 +215,6 @@ export function getCachedLpPoolPrice(tokenAddress: string): string | null {
   const normalizedAddress = tokenAddress.toLowerCase();
   const cached = lpPoolPriceCache.get(normalizedAddress);
 
-  // LP pool prices have shorter TTL (5 minutes) due to DEX volatility
-  const LP_CACHE_TTL_MS = 5 * 60 * 1000;
   if (cached && Date.now() - cached.timestamp < LP_CACHE_TTL_MS) {
     return cached.price;
   }
