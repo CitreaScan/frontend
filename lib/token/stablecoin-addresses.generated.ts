@@ -47,6 +47,7 @@ export const VAULT_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
 export const EQUITY_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
   '4114': [
     '0x2a36f2b204b46fd82653cd06d00c7ff757c99ae4',
+    '0xfaed2b431304426f9320761afdc698463b6fd8c7',
   ],
   '5115': [
     '0x7fa131991c8a7d8c21b11391c977fc7c4c8e0d5e',
