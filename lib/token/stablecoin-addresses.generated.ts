@@ -67,7 +67,7 @@ export const BTC_PEGGED_ADDRESSES: Record<string, ReadonlyArray<string>> = {
 };
 
 /**
- * LP pool price tokens by chain ID.
+ * LP pool price tokens by chain ID (graduated bonding curve tokens).
  * Maps token addresses to their Uniswap V2 style LP pool addresses.
  * Price is calculated from pool reserves where quote token is a stablecoin.
  * Format: { tokenAddress: { pool: poolAddress, quoteTokenIndex: 0 | 1 } }
@@ -80,4 +80,16 @@ export const LP_POOL_PRICE_TOKENS: Record<string, Record<string, { pool: string;
       quoteTokenIndex: 0,
     },
   },
+};
+
+/**
+ * Bonding curve token addresses by chain ID (not yet graduated).
+ * Price is calculated from virtualBaseReserves / virtualTokenReserves.
+ * These tokens use the pump.fun style bonding curve mechanism.
+ */
+export const BONDING_CURVE_TOKENS: Record<string, ReadonlyArray<string>> = {
+  '4114': [
+    // THERESIA - active bonding curve
+    '0x1a5d37d3b9783cfeb0b91768f16fa1cfebf4d0bc',
+  ],
 };
