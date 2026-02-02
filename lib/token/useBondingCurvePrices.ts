@@ -8,7 +8,7 @@ import { setCachedBondingCurvePrice } from './stablecoins';
 const BONDING_CURVE_PRICE_STALE_TIME = 5 * 60 * 1000; // 5 minutes (prices change with buys/sells)
 
 // Function selectors for bonding curve contract
-// virtualBaseReserves() - returns the virtual BTC reserve
+// virtualBaseReserves() - returns the virtual stablecoin (JUSD) reserve
 const VIRTUAL_BASE_RESERVES_SELECTOR = '0xae43509a';
 // virtualTokenReserves() - returns the virtual token reserve
 const VIRTUAL_TOKEN_RESERVES_SELECTOR = '0x1655bc62';
