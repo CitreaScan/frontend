@@ -9,9 +9,9 @@ const BONDING_CURVE_PRICE_STALE_TIME = 5 * 60 * 1000; // 5 minutes (prices chang
 
 // Function selectors for bonding curve contract
 // virtualBaseReserves() - returns the virtual BTC reserve
-const VIRTUAL_BASE_RESERVES_SELECTOR = '0x5ce6f9d1';
+const VIRTUAL_BASE_RESERVES_SELECTOR = '0xae43509a';
 // virtualTokenReserves() - returns the virtual token reserve
-const VIRTUAL_TOKEN_RESERVES_SELECTOR = '0x1c5dfe91';
+const VIRTUAL_TOKEN_RESERVES_SELECTOR = '0x1655bc62';
 
 interface RpcResponse {
   result?: string;
