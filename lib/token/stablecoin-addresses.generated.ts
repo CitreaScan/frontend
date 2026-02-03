@@ -65,3 +65,31 @@ export const BTC_PEGGED_ADDRESSES: Record<string, ReadonlyArray<string>> = {
     '0x384157027b1cdeac4e26e3709667bb28735379bb',
   ],
 };
+
+/**
+ * LP pool price tokens by chain ID (graduated bonding curve tokens).
+ * Maps token addresses to their Uniswap V2 style LP pool addresses.
+ * Price is calculated from pool reserves where quote token is a stablecoin.
+ * Format: { tokenAddress: { pool: poolAddress, quoteTokenIndex: 0 | 1 } }
+ */
+export const LP_POOL_PRICE_TOKENS: Record<string, Record<string, { pool: string; quoteTokenIndex: 0 | 1 }>> = {
+  '4114': {
+    // TAPFREAK - JuiceSwap V2 pool with JUSD as quote token (token0)
+    '0xfaed2b431304426f9320761afdc698463b6fd8c7': {
+      pool: '0x13e8472d36bbedc99e74b635d74cc6d68508d0f5',
+      quoteTokenIndex: 0,
+    },
+  },
+};
+
+/**
+ * Bonding curve token addresses by chain ID (not yet graduated).
+ * Price is calculated from virtualBaseReserves / virtualTokenReserves.
+ * These tokens use the pump.fun style bonding curve mechanism.
+ */
+export const BONDING_CURVE_TOKENS: Record<string, ReadonlyArray<string>> = {
+  '4114': [
+    // THERESIA - active bonding curve
+    '0x1a5d37d3b9783cfeb0b91768f16fa1cfebf4d0bc',
+  ],
+};
