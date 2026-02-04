@@ -1,8 +1,6 @@
-import { get } from 'es-toolkit/compat';
 import React from 'react';
 
-import getErrorObj from 'lib/errors/getErrorObj';
-
+import isWalletChainNotAddedError from './isWalletChainNotAddedError';
 import useAddChain from './useAddChain';
 import useProvider from './useProvider';
 import useSwitchChain from './useSwitchChain';
@@ -18,17 +16,11 @@ export default function useSwitchOrAddChain() {
     }
 
     try {
-      return switchChain();
+      return await switchChain();
     } catch (error) {
-      const errorObj = getErrorObj(error);
-      const code = get(errorObj, 'code');
-      const originalErrorCode = get(errorObj, 'data.originalError.code');
-
-      // This error code indicates that the chain has not been added to Wallet.
-      if (code === 4902 || originalErrorCode === 4902) {
+      if (isWalletChainNotAddedError(error)) {
         return addChain();
       }
-
       throw error;
     }
   }, [ addChain, provider, wallet, switchChain ]);
