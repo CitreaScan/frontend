@@ -16,7 +16,7 @@ export default function useSwitchOrAddChain() {
     }
 
     try {
-      return switchChain();
+      return await switchChain();
     } catch (error) {
       if (isWalletChainNotAddedError(error)) {
         return addChain();
