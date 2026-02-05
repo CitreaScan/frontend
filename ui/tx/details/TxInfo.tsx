@@ -23,6 +23,7 @@ import useIsMobile from 'lib/hooks/useIsMobile';
 import getNetworkValidatorTitle from 'lib/networks/getNetworkValidatorTitle';
 import * as arbitrum from 'lib/rollups/arbitrum';
 import getConfirmationDuration from 'lib/tx/getConfirmationDuration';
+import useInternalValueFlowFromAddress from 'lib/tx/useInternalValueFlowFromAddress';
 import { currencyUnits } from 'lib/units';
 import { Badge } from 'toolkit/chakra/badge';
 import { CollapsibleDetails } from 'toolkit/chakra/collapsible';
@@ -48,6 +49,7 @@ import RawInputData from 'ui/shared/RawInputData';
 import StatusTag from 'ui/shared/statusTag/StatusTag';
 import TxStatus from 'ui/shared/statusTag/TxStatus';
 import TextSeparator from 'ui/shared/TextSeparator';
+import TxInternalValueFlowBreakdown from 'ui/shared/tx/TxInternalValueFlowBreakdown';
 import Utilization from 'ui/shared/Utilization/Utilization';
 import VerificationSteps from 'ui/shared/verificationSteps/VerificationSteps';
 import TxDetailsActions from 'ui/tx/details/txDetailsActions/TxDetailsActions';
@@ -85,6 +87,10 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
   const [ isExpanded, setIsExpanded ] = React.useState(false);
 
   const isMobile = useIsMobile();
+  const { flow: flowFromAddress, isLoading: isAddressTxsLoading } = useInternalValueFlowFromAddress(
+    data?.hash,
+    data?.from?.hash,
+  );
 
   const externalTxsQuery = useApiQuery('general:tx_external_transactions', {
     pathParams: {
@@ -627,24 +633,39 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
       { (data.zkevm_batch_number || data.zkevm_verify_hash) && <DetailedInfo.ItemDivider/> }
 
       { !config.UI.views.tx.hiddenFields?.value && (
-        <>
-          <DetailedInfo.ItemLabel
-            hint="Value sent in the native token (and USD) if applicable"
-            isLoading={ isLoading }
-          >
-            Value
-          </DetailedInfo.ItemLabel>
-          <DetailedInfo.ItemValue>
-            <CurrencyValue
-              value={ data.value }
-              currency={ currencyUnits.ether }
-              exchangeRate={ data.exchange_rate }
-              isLoading={ isLoading }
-              flexWrap="wrap"
-              accuracyUsd={ 2 }
-            />
-          </DetailedInfo.ItemValue>
-        </>
+        (() => {
+          const flow = data.internal_value_flow ?? flowFromAddress;
+          const hasInternalValueFlow = flow && !(flow.in === '0' && flow.out === '0');
+          const internalFlowLoading = isLoading || (!data.internal_value_flow && Boolean(data.hash && data.from?.hash) && isAddressTxsLoading);
+          const displayDataForFlow = flow && !data.internal_value_flow ?
+            { ...data, internal_value_flow: flow } :
+            data;
+          return (
+            <>
+              <DetailedInfo.ItemLabel
+                hint="Value sent in the native token (and USD) if applicable"
+                isLoading={ isLoading }
+              >
+                Value
+              </DetailedInfo.ItemLabel>
+              <DetailedInfo.ItemValue multiRow>
+                <CurrencyValue
+                  value={ data.value }
+                  currency={ currencyUnits.ether }
+                  exchangeRate={ data.exchange_rate }
+                  isLoading={ isLoading }
+                  flexWrap="wrap"
+                  mr={ hasInternalValueFlow ? 3 : 0 }
+                  rowGap={ 0 }
+                  accuracyUsd={ 2 }
+                />
+                { hasInternalValueFlow && displayDataForFlow && (
+                  <TxInternalValueFlowBreakdown data={ displayDataForFlow } isLoading={ internalFlowLoading }/>
+                ) }
+              </DetailedInfo.ItemValue>
+            </>
+          );
+        })()
       ) }
 
       <TxDetailsTxFee isLoading={ isLoading } data={ data }/>
