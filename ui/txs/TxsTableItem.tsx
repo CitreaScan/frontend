@@ -1,4 +1,5 @@
 import { Flex, VStack } from '@chakra-ui/react';
+import BigNumber from 'bignumber.js';
 import React from 'react';
 
 import type { Transaction } from 'types/api/transaction';
@@ -34,6 +35,9 @@ type Props = {
 
 const TxsTableItem = ({ tx, showBlockInfo, currentAddress, enableTimeIncrement, isLoading, animation, chainData }: Props) => {
   const dataTo = tx.to ? tx.to : tx.created_contract;
+  const flow = tx.internal_value_flow;
+  const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
+  const displayValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() : tx.value;
 
   return (
     <TableRow key={ tx.hash } animation={ animation }>
@@ -113,7 +117,7 @@ const TxsTableItem = ({ tx, showBlockInfo, currentAddress, enableTimeIncrement, 
       </TableCell>
       { !config.UI.views.tx.hiddenFields?.value && (
         <TableCell isNumeric>
-          <CurrencyValue value={ tx.value } accuracy={ 8 } isLoading={ isLoading } wordBreak="break-word"/>
+          <CurrencyValue value={ displayValue } accuracy={ 8 } isLoading={ isLoading } wordBreak="break-word"/>
         </TableCell>
       ) }
       { !config.UI.views.tx.hiddenFields?.tx_fee && (
