@@ -2,6 +2,7 @@ import {
   HStack,
   Flex,
 } from '@chakra-ui/react';
+import BigNumber from 'bignumber.js';
 import React from 'react';
 
 import type { Transaction } from 'types/api/transaction';
@@ -37,6 +38,9 @@ type Props = {
 
 const TxsListItem = ({ tx, isLoading, showBlockInfo, currentAddress, enableTimeIncrement, animation, chainData }: Props) => {
   const dataTo = tx.to ? tx.to : tx.created_contract;
+  const flow = tx.internal_value_flow;
+  const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
+  const displayValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() : tx.value;
 
   return (
     <ListItemMobile display="block" width="100%" animation={ animation } key={ tx.hash }>
@@ -112,7 +116,7 @@ const TxsListItem = ({ tx, isLoading, showBlockInfo, currentAddress, enableTimeI
           <Skeleton loading={ isLoading } display="inline-block" whiteSpace="pre">Value</Skeleton>
           <Skeleton loading={ isLoading } display="inline-block" color="text.secondary" whiteSpace="pre">
             <span>
-              { getValueWithUnit(tx.value).toFormat() }
+              { getValueWithUnit(displayValue).toFormat() }
               { space }
               { currencyUnits.ether }
             </span>
