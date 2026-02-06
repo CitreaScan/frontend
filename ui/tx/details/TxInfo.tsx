@@ -112,7 +112,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
 
   const flow = data.internal_value_flow;
   const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
-  const totalValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).toString() : data.value;
+  const totalValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() : data.value;
 
   const addressFromTags = [
     ...data.from.private_tags || [],
