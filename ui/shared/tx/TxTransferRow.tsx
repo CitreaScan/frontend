@@ -29,15 +29,15 @@ const TxTransferRow = ({ data, isLoading }: Props) => {
   if (!flow || (flow.in === '0' && flow.out === '0')) return null;
 
   const method = data.method?.toLowerCase();
-  if (method !== 'claim' && method !== 'claimbatch' && method !== 'refund' && method !== 'lock') return null;
+  if (method !== 'claim' && method !== 'claimbatch' && method !== 'refund' && method !== 'lock' && method !== 'deposit') return null;
 
   const netValue = BigNumber(flow.in).minus(BigNumber(flow.out)).abs();
   if (netValue.lte(0)) return null;
 
-  const isLock = method === 'lock';
-  const fromAddress = isLock ? data.from : data.to;
+  const isLockOrDeposit = method === 'lock' || method === 'deposit';
+  const fromAddress = isLockOrDeposit ? data.from : data.to;
   let toAddress;
-  if (isLock) {
+  if (isLockOrDeposit) {
     toAddress = data.to;
   } else if (method === 'refund') {
     toAddress = data.from;
