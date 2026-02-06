@@ -48,6 +48,8 @@ import RawInputData from 'ui/shared/RawInputData';
 import StatusTag from 'ui/shared/statusTag/StatusTag';
 import TxStatus from 'ui/shared/statusTag/TxStatus';
 import TextSeparator from 'ui/shared/TextSeparator';
+import TxInternalValueFlowBreakdown from 'ui/shared/tx/TxInternalValueFlowBreakdown';
+import TxTransferRow from 'ui/shared/tx/TxTransferRow';
 import Utilization from 'ui/shared/Utilization/Utilization';
 import VerificationSteps from 'ui/shared/verificationSteps/VerificationSteps';
 import TxDetailsActions from 'ui/tx/details/txDetailsActions/TxDetailsActions';
@@ -107,6 +109,10 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
   if (!data) {
     return null;
   }
+
+  const flow = data.internal_value_flow;
+  const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
+  const totalValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() : data.value;
 
   const addressFromTags = [
     ...data.from.private_tags || [],
@@ -634,18 +640,27 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
           >
             Value
           </DetailedInfo.ItemLabel>
-          <DetailedInfo.ItemValue>
+          <DetailedInfo.ItemValue multiRow>
             <CurrencyValue
-              value={ data.value }
+              value={ totalValue }
               currency={ currencyUnits.ether }
               exchangeRate={ data.exchange_rate }
               isLoading={ isLoading }
               flexWrap="wrap"
+              mr={ hasInternalValueFlow ? 3 : 0 }
+              rowGap={ 0 }
               accuracyUsd={ 2 }
             />
+            { hasInternalValueFlow && data.internal_value_flow ? (
+              <TxInternalValueFlowBreakdown data={ data } isLoading={ isLoading }/>
+            ) : null }
           </DetailedInfo.ItemValue>
         </>
       ) }
+
+      { hasInternalValueFlow && data.internal_value_flow ? (
+        <TxTransferRow data={ data } isLoading={ isLoading }/>
+      ) : null }
 
       <TxDetailsTxFee isLoading={ isLoading } data={ data }/>
 

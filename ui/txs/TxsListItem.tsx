@@ -12,12 +12,10 @@ import config from 'configs/app';
 import getValueWithUnit from 'lib/getValueWithUnit';
 import { currencyUnits } from 'lib/units';
 import { Skeleton } from 'toolkit/chakra/skeleton';
-import { Tooltip } from 'toolkit/chakra/tooltip';
 import { space } from 'toolkit/utils/htmlEntities';
 import AddressFromTo from 'ui/shared/address/AddressFromTo';
 import BlockEntity from 'ui/shared/entities/block/BlockEntity';
 import TxEntity from 'ui/shared/entities/tx/TxEntity';
-import IconSvg from 'ui/shared/IconSvg';
 import ListItemMobile from 'ui/shared/ListItemMobile/ListItemMobile';
 import TxStatus from 'ui/shared/statusTag/TxStatus';
 import TimeWithTooltip from 'ui/shared/time/TimeWithTooltip';
@@ -40,16 +38,9 @@ type Props = {
 
 const TxsListItem = ({ tx, isLoading, showBlockInfo, currentAddress, enableTimeIncrement, animation, chainData }: Props) => {
   const dataTo = tx.to ? tx.to : tx.created_contract;
-
-  // Calculate display value: use internal_value_flow if tx.value is 0
-  const txValue = new BigNumber(tx.value);
-  const hasInternalValueFlow = tx.internal_value_flow &&
-    (tx.internal_value_flow.in !== '0' || tx.internal_value_flow.out !== '0');
-  const internalValueIn = hasInternalValueFlow ? new BigNumber(tx.internal_value_flow?.in || '0') : new BigNumber(0);
-
-  // Show internal value when tx.value is 0 and there's internal flow
-  const showInternalValue = txValue.isZero() && hasInternalValueFlow && internalValueIn.gt(0);
-  const displayValue = showInternalValue ? (tx.internal_value_flow?.in || '0') : tx.value;
+  const flow = tx.internal_value_flow;
+  const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
+  const displayValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() : tx.value;
 
   return (
     <ListItemMobile display="block" width="100%" animation={ animation } key={ tx.hash }>
@@ -123,11 +114,6 @@ const TxsListItem = ({ tx, isLoading, showBlockInfo, currentAddress, enableTimeI
       { !config.UI.views.tx.hiddenFields?.value && (
         <Flex mt={ 2 } columnGap={ 2 } alignItems="center">
           <Skeleton loading={ isLoading } display="inline-block" whiteSpace="pre">Value</Skeleton>
-          { showInternalValue && (
-            <Tooltip content="Value from internal transaction">
-              <IconSvg name="internal_txns" boxSize={ 4 } color="text.secondary" flexShrink={ 0 }/>
-            </Tooltip>
-          ) }
           <Skeleton loading={ isLoading } display="inline-block" color="text.secondary" whiteSpace="pre">
             <span>
               { getValueWithUnit(displayValue).toFormat() }
