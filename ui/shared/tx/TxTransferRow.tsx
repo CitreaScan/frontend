@@ -48,7 +48,6 @@ const TxTransferRow = ({ data, isLoading }: Props) => {
       </DetailedInfo.ItemLabel>
       <DetailedInfo.ItemValue>
         <Flex alignItems="center" flexWrap="wrap" gap={ 2 }>
-          <span>1.</span>
           <CurrencyValue
             value={ netValue.toString() }
             currency={ currencyUnits.ether }
