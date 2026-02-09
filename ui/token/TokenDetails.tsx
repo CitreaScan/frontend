@@ -116,7 +116,7 @@ const TokenDetails = ({ tokenQuery }: Props) => {
           </DetailedInfo.ItemLabel>
           <DetailedInfo.ItemValue>
             <Skeleton loading={ tokenQuery.isPlaceholderData } display="inline-block">
-              <span>{ `$${ Number(exchangeRate).toLocaleString(undefined, { minimumSignificantDigits: 4 }) }` }</span>
+              <span>{ `$${ Number(exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }` }</span>
             </Skeleton>
           </DetailedInfo.ItemValue>
         </>
