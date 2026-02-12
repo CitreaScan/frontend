@@ -52,8 +52,8 @@ const TxTransferRow = ({ data, isLoading }: Props) => {
       >
         Transfer
       </DetailedInfo.ItemLabel>
-      <DetailedInfo.ItemValue>
-        <Flex alignItems="center" flexWrap="wrap" gap={ 2 }>
+      <DetailedInfo.ItemValue minW={ 0 } overflow="hidden">
+        <Flex alignItems="center" flexWrap="wrap" gap={ 2 } minW={ 0 } maxW="100%">
           <span>from</span>
           <AddressEntity address={ fromAddress } isLoading={ isLoading } noIcon/>
           <span>to</span>
