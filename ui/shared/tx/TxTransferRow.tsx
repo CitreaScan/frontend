@@ -4,8 +4,6 @@ import React from 'react';
 
 import type { Transaction } from 'types/api/transaction';
 
-import { currencyUnits } from 'lib/units';
-import CurrencyValue from 'ui/shared/CurrencyValue';
 import * as DetailedInfo from 'ui/shared/DetailedInfo/DetailedInfo';
 import AddressEntity from 'ui/shared/entities/address/AddressEntity';
 
@@ -54,15 +52,8 @@ const TxTransferRow = ({ data, isLoading }: Props) => {
       >
         Transfer
       </DetailedInfo.ItemLabel>
-      <DetailedInfo.ItemValue>
-        <Flex alignItems="center" flexWrap="wrap" gap={ 2 }>
-          <CurrencyValue
-            value={ netValue.toString() }
-            currency={ currencyUnits.ether }
-            exchangeRate={ data.exchange_rate }
-            isLoading={ isLoading }
-            accuracyUsd={ 2 }
-          />
+      <DetailedInfo.ItemValue minW={ 0 } overflow="hidden">
+        <Flex alignItems="center" flexWrap="wrap" gap={ 2 } minW={ 0 } maxW="100%">
           <span>from</span>
           <AddressEntity address={ fromAddress } isLoading={ isLoading } noIcon/>
           <span>to</span>
