@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js';
 import React from 'react';
 
 import type * as tac from '@blockscout/tac-operation-lifecycle-types';
+import type { InternalTransaction } from 'types/api/internalTransaction';
 import { SCROLL_L2_BLOCK_STATUSES } from 'types/api/scrollL2';
 import type { Transaction } from 'types/api/transaction';
 import { ZKEVM_L2_TX_STATUSES } from 'types/api/transaction';
@@ -48,6 +49,8 @@ import RawInputData from 'ui/shared/RawInputData';
 import StatusTag from 'ui/shared/statusTag/StatusTag';
 import TxStatus from 'ui/shared/statusTag/TxStatus';
 import TextSeparator from 'ui/shared/TextSeparator';
+import TxInternalValueFlowBreakdown from 'ui/shared/tx/TxInternalValueFlowBreakdown';
+import TxTransferRow from 'ui/shared/tx/TxTransferRow';
 import Utilization from 'ui/shared/Utilization/Utilization';
 import VerificationSteps from 'ui/shared/verificationSteps/VerificationSteps';
 import TxDetailsActions from 'ui/tx/details/txDetailsActions/TxDetailsActions';
@@ -81,6 +84,12 @@ interface Props {
 const externalTxFeature = config.features.externalTxs;
 const rollupFeature = config.features.rollup;
 
+function getInternalTransfer(items: Array<InternalTransaction> | undefined) {
+  const item = items?.find((tx) => tx.value !== '0') ?? items?.[0];
+  const to = item?.to ?? item?.created_contract;
+  return item?.from?.hash && to?.hash ? { from: item.from, to } : undefined;
+}
+
 const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
   const [ isExpanded, setIsExpanded ] = React.useState(false);
 
@@ -96,6 +105,20 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
     },
   });
 
+  const internalTxsQuery = useApiQuery('general:tx_internal_txs', {
+    pathParams: { hash: data?.hash ?? '' },
+    queryOptions: {
+      enabled: Boolean(
+        data?.hash &&
+        data?.internal_value_flow &&
+        (data.internal_value_flow.in !== '0' || data.internal_value_flow.out !== '0') &&
+        [ 'claim', 'claimbatch', 'refund', 'lock', 'deposit' ].includes((data?.method ?? '').toLowerCase()),
+      ),
+    },
+  });
+
+  const internalTransfer = getInternalTransfer(internalTxsQuery.data?.items);
+
   const handleCutLinkClick = React.useCallback(() => {
     setIsExpanded((flag) => !flag);
   }, []);
@@ -107,6 +130,11 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
   if (!data) {
     return null;
   }
+
+  const flow = data.internal_value_flow;
+  const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
+  const needInternalTransfer = hasInternalValueFlow && [ 'claim', 'claimbatch', 'refund', 'lock', 'deposit' ].includes((data.method ?? '').toLowerCase());
+  const totalValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() : data.value;
 
   const addressFromTags = [
     ...data.from.private_tags || [],
@@ -634,18 +662,27 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
           >
             Value
           </DetailedInfo.ItemLabel>
-          <DetailedInfo.ItemValue>
+          <DetailedInfo.ItemValue multiRow>
             <CurrencyValue
-              value={ data.value }
+              value={ totalValue }
               currency={ currencyUnits.ether }
               exchangeRate={ data.exchange_rate }
               isLoading={ isLoading }
               flexWrap="wrap"
+              mr={ hasInternalValueFlow ? 3 : 0 }
+              rowGap={ 0 }
               accuracyUsd={ 2 }
             />
+            { hasInternalValueFlow && data.internal_value_flow ? (
+              <TxInternalValueFlowBreakdown data={ data } isLoading={ isLoading }/>
+            ) : null }
           </DetailedInfo.ItemValue>
         </>
       ) }
+
+      { hasInternalValueFlow && data.internal_value_flow && (!needInternalTransfer || !internalTxsQuery.isLoading) ? (
+        <TxTransferRow data={ data } isLoading={ isLoading } internalTransfer={ internalTransfer }/>
+      ) : null }
 
       <TxDetailsTxFee isLoading={ isLoading } data={ data }/>
 

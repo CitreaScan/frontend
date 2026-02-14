@@ -8,14 +8,12 @@ import type { ChainConfig } from 'types/multichain';
 import config from 'configs/app';
 import { Badge } from 'toolkit/chakra/badge';
 import { TableCell, TableRow } from 'toolkit/chakra/table';
-import { Tooltip } from 'toolkit/chakra/tooltip';
 import ChainIcon from 'ui/optimismSuperchain/components/ChainIcon';
 import AddressFromTo from 'ui/shared/address/AddressFromTo';
 import BlockPendingUpdateHint from 'ui/shared/block/BlockPendingUpdateHint';
 import CurrencyValue from 'ui/shared/CurrencyValue';
 import BlockEntity from 'ui/shared/entities/block/BlockEntity';
 import TxEntity from 'ui/shared/entities/tx/TxEntity';
-import IconSvg from 'ui/shared/IconSvg';
 import TxStatus from 'ui/shared/statusTag/TxStatus';
 import TimeWithTooltip from 'ui/shared/time/TimeWithTooltip';
 import TxFee from 'ui/shared/tx/TxFee';
@@ -37,16 +35,9 @@ type Props = {
 
 const TxsTableItem = ({ tx, showBlockInfo, currentAddress, enableTimeIncrement, isLoading, animation, chainData }: Props) => {
   const dataTo = tx.to ? tx.to : tx.created_contract;
-
-  // Calculate display value: use internal_value_flow if tx.value is 0
-  const txValue = new BigNumber(tx.value);
-  const hasInternalValueFlow = tx.internal_value_flow &&
-    (tx.internal_value_flow.in !== '0' || tx.internal_value_flow.out !== '0');
-  const internalValueIn = hasInternalValueFlow ? new BigNumber(tx.internal_value_flow?.in || '0') : new BigNumber(0);
-
-  // Show internal value when tx.value is 0 and there's internal flow
-  const showInternalValue = txValue.isZero() && hasInternalValueFlow && internalValueIn.gt(0);
-  const displayValue = showInternalValue ? tx.internal_value_flow?.in || '0' : tx.value;
+  const flow = tx.internal_value_flow;
+  const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
+  const displayValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() : tx.value;
 
   return (
     <TableRow key={ tx.hash } animation={ animation }>
@@ -126,14 +117,7 @@ const TxsTableItem = ({ tx, showBlockInfo, currentAddress, enableTimeIncrement, 
       </TableCell>
       { !config.UI.views.tx.hiddenFields?.value && (
         <TableCell isNumeric>
-          <Flex alignItems="center" justifyContent="flex-end" gap={ 1 }>
-            { showInternalValue && (
-              <Tooltip content="Value from internal transaction">
-                <IconSvg name="internal_txns" boxSize={ 4 } color="text.secondary" flexShrink={ 0 }/>
-              </Tooltip>
-            ) }
-            <CurrencyValue value={ displayValue } accuracy={ 8 } isLoading={ isLoading } wordBreak="break-word"/>
-          </Flex>
+          <CurrencyValue value={ displayValue } accuracy={ 8 } isLoading={ isLoading } wordBreak="break-word"/>
         </TableCell>
       ) }
       { !config.UI.views.tx.hiddenFields?.tx_fee && (

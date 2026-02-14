@@ -21,6 +21,7 @@ declare module "nextjs-routes" {
     | StaticRoute<"/api/config">
     | StaticRoute<"/api/csrf">
     | StaticRoute<"/api/healthz">
+    | StaticRoute<"/api/launchpad-token">
     | StaticRoute<"/api/log">
     | StaticRoute<"/api/media-type">
     | StaticRoute<"/api/metrics">
