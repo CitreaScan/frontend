@@ -16,6 +16,8 @@ const TOKEN_OF_OWNER_BY_INDEX = '0x2f745c59';
 const POSITIONS_SELECTOR = '0x99fbab88';
 const GET_POOL = '0x1698ee82';
 const SLOT0 = '0x3850c7bd';
+const SYMBOL_SELECTOR = '0x95d89b41';
+const DECIMALS_SELECTOR = '0x313ce567';
 
 interface RpcResponse {
   result?: string;
@@ -28,6 +30,19 @@ export interface JuiceSwapPosition {
   token1Address: string;
   amount0Wei: string;
   amount1Wei: string;
+}
+
+export interface JuiceSwapPositionDetail extends JuiceSwapPosition {
+  fee: number;
+  tickLower: number;
+  tickUpper: number;
+  currentTick: number;
+  inRange: boolean;
+  token0Decimals: number;
+  token1Decimals: number;
+  token0Symbol: string;
+  token1Symbol: string;
+  liquidity: number;
 }
 
 async function rpcCall(rpcUrl: string, to: string, data: string): Promise<string> {
@@ -211,3 +226,121 @@ export function useJuiceSwapPositions(addressHash?: string) {
     enabled: Boolean(rpcUrl) && Boolean(addressHash),
   });
 }
+
+function decodeString(hex: string): string {
+  const raw = hex.slice(2);
+  if (raw.length < 128) {
+    return '';
+  }
+  const length = parseInt(raw.slice(64, 128), 16);
+  const bytes = raw.slice(128, 128 + length * 2);
+  let result = '';
+  for (let i = 0; i < bytes.length; i += 2) {
+    result += String.fromCharCode(parseInt(bytes.slice(i, i + 2), 16));
+  }
+  return result;
+}
+
+async function fetchSinglePosition(
+  rpcUrl: string,
+  tokenId: number,
+): Promise<JuiceSwapPositionDetail> {
+  // 1. positions(tokenId) -> 12 ABI-encoded fields
+  const posResult = await rpcCall(
+    rpcUrl, NFT_MANAGER,
+    POSITIONS_SELECTOR + padUint256(tokenId),
+  );
+  const raw = posResult.slice(2);
+  const fields: Array<string> = [];
+  for (let j = 0; j < 12; j++) {
+    fields.push(raw.slice(j * 64, (j + 1) * 64));
+  }
+
+  const token0 = '0x' + fields[2].slice(24);
+  const token1 = '0x' + fields[3].slice(24);
+  const fee = parseInt(fields[4], 16);
+
+  const INT256_MAX = BigInt(1) << BigInt(255);
+  const UINT256_RANGE = BigInt(1) << BigInt(256);
+  const tickLowerRaw = BigInt('0x' + fields[5]);
+  const tickLower = Number(tickLowerRaw >= INT256_MAX ? tickLowerRaw - UINT256_RANGE : tickLowerRaw);
+  const tickUpperRaw = BigInt('0x' + fields[6]);
+  const tickUpper = Number(tickUpperRaw >= INT256_MAX ? tickUpperRaw - UINT256_RANGE : tickUpperRaw);
+  const liquidity = parseFloat(BigInt('0x' + fields[7]).toString());
+
+  // 2. Fetch token metadata (symbol + decimals) in parallel
+  const [ symbol0Result, symbol1Result, decimals0Result, decimals1Result ] = await Promise.all([
+    rpcCall(rpcUrl, token0, SYMBOL_SELECTOR),
+    rpcCall(rpcUrl, token1, SYMBOL_SELECTOR),
+    rpcCall(rpcUrl, token0, DECIMALS_SELECTOR),
+    rpcCall(rpcUrl, token1, DECIMALS_SELECTOR),
+  ]);
+
+  const token0Symbol = decodeString(symbol0Result) || 'Token0';
+  const token1Symbol = decodeString(symbol1Result) || 'Token1';
+  const token0Decimals = parseInt(decimals0Result, 16) || 18;
+  const token1Decimals = parseInt(decimals1Result, 16) || 18;
+
+  // 3. Get pool and slot0
+  const poolResult = await rpcCall(
+    rpcUrl, FACTORY,
+    GET_POOL + padAddress(token0) + padAddress(token1) + padUint256(fee),
+  );
+  const poolAddr = '0x' + poolResult.slice(26);
+  const slot0Result = await rpcCall(rpcUrl, poolAddr, SLOT0);
+  const sqrtPriceX96 = Number(BigInt('0x' + slot0Result.slice(2, 66)));
+
+  // 4. V3 math
+  const sqrtRatioA = Math.sqrt(1.0001 ** tickLower);
+  const sqrtRatioB = Math.sqrt(1.0001 ** tickUpper);
+  const sqrtPrice = sqrtPriceX96 / (2 ** 96);
+  const currentTick = Math.log(sqrtPrice ** 2) / Math.log(1.0001);
+
+  let amount0 = 0;
+  let amount1 = 0;
+  if (liquidity > 0) {
+    if (currentTick <= tickLower) {
+      amount0 = liquidity * ((sqrtRatioB - sqrtRatioA) / (sqrtRatioA * sqrtRatioB));
+    } else if (currentTick > tickUpper) {
+      amount1 = liquidity * (sqrtRatioB - sqrtRatioA);
+    } else {
+      amount0 = liquidity * ((sqrtRatioB - sqrtPrice) / (sqrtPrice * sqrtRatioB));
+      amount1 = liquidity * (sqrtPrice - sqrtRatioA);
+    }
+  }
+
+  const inRange = currentTick >= tickLower && currentTick <= tickUpper;
+
+  return {
+    tokenId,
+    token0Address: token0,
+    token1Address: token1,
+    amount0Wei: BigInt(Math.round(amount0)).toString(),
+    amount1Wei: BigInt(Math.round(amount1)).toString(),
+    fee,
+    tickLower,
+    tickUpper,
+    currentTick: Math.floor(currentTick),
+    inRange,
+    token0Decimals,
+    token1Decimals,
+    token0Symbol,
+    token1Symbol,
+    liquidity,
+  };
+}
+
+export function useJuiceSwapPosition(tokenId?: string) {
+  const rpcUrl = config.chain.rpcUrls?.[0];
+  const numericId = tokenId ? parseInt(tokenId, 10) : NaN;
+
+  return useQuery({
+    queryKey: [ 'juiceswap-position', tokenId ],
+    queryFn: () => fetchSinglePosition(rpcUrl ?? '', numericId),
+    staleTime: STALE_TIME,
+    refetchInterval: STALE_TIME,
+    enabled: Boolean(rpcUrl) && !isNaN(numericId),
+  });
+}
+
+export { NFT_MANAGER };
