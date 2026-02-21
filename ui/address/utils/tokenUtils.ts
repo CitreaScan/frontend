@@ -65,7 +65,21 @@ const sortErc20Tokens = (sort: Sort) => (dataA: TokenEnhancedData, dataB: TokenE
   return dataA.usd.gt(dataB.usd) ? 1 : -1;
 };
 
-const sortErc721Tokens = () => () => 0;
+const sortErc721Tokens = (sort: Sort) => (dataA: TokenEnhancedData, dataB: TokenEnhancedData) => {
+  if (!dataA.usd && !dataB.usd) {
+    return 0;
+  }
+  if (!dataB.usd) {
+    return -1;
+  }
+  if (!dataA.usd) {
+    return 1;
+  }
+  if (sort === 'desc') {
+    return dataA.usd.gt(dataB.usd) ? -1 : 1;
+  }
+  return dataA.usd.gt(dataB.usd) ? 1 : -1;
+};
 
 export const sortingFns = {
   'ERC-20': sortErc20Tokens,

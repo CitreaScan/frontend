@@ -5,6 +5,8 @@ import React from 'react';
 import config from 'configs/app';
 import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
+import { NFT_MANAGER, createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { currencyUnits } from 'lib/units';
 import { ZERO } from 'toolkit/utils/consts';
 import DataFetchAlert from 'ui/shared/DataFetchAlert';
@@ -29,6 +31,27 @@ const TokenBalances = () => {
     hash,
     nativeExchangeRate: addressQuery.data?.exchange_rate,
   });
+  const lpQuery = useJuiceSwapPositions(hash);
+  const { version: pricesVersion } = useTokenPrices();
+
+  const dataWithLp = React.useMemo(() => {
+    if (!lpQuery.data?.length) {
+      return tokenQuery.data;
+    }
+    const nativeExchangeRate = addressQuery.data?.exchange_rate;
+    const lpItems = createLpTokenBalances(lpQuery.data, nativeExchangeRate);
+    const filteredErc721 = tokenQuery.data['ERC-721'].items.filter(
+      item => item.token.address_hash.toLowerCase() !== NFT_MANAGER.toLowerCase(),
+    );
+    return {
+      ...tokenQuery.data,
+      'ERC-721': {
+        ...tokenQuery.data['ERC-721'],
+        items: [ ...filteredErc721, ...lpItems ],
+      },
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- pricesVersion triggers recompute when vault prices load
+  }, [ tokenQuery.data, lpQuery.data, addressQuery.data?.exchange_rate, pricesVersion ]);
 
   if (addressQuery.isError || tokenQuery.isError) {
     return <DataFetchAlert/>;
@@ -43,7 +66,7 @@ const TokenBalances = () => {
     decimals: String(config.chain.currency.decimals),
   });
 
-  const tokensInfo = getTokensTotalInfo(tokenQuery.data);
+  const tokensInfo = getTokensTotalInfo(dataWithLp);
   const prefix = tokensInfo.isOverflow ? '>' : '';
   const totalUsd = nativeUsd.plus(tokensInfo.usd);
   const tokensNumText = tokensInfo.num > 0 ?

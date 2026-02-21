@@ -17,6 +17,7 @@ import TokenSelectItem from './TokenSelectItem';
 interface Props {
   searchTerm: string;
   erc20sort: Sort;
+  erc721sort: Sort;
   erc1155sort: Sort;
   erc404sort: Sort;
   filteredData: FormattedData;
@@ -24,7 +25,7 @@ interface Props {
   onSortClick: (event: React.SyntheticEvent) => void;
 }
 
-const TokenSelectMenu = ({ erc20sort, erc1155sort, erc404sort, filteredData, onInputChange, onSortClick, searchTerm }: Props) => {
+const TokenSelectMenu = ({ erc20sort, erc721sort, erc1155sort, erc404sort, filteredData, onInputChange, onSortClick, searchTerm }: Props) => {
   const hasFilteredResult = sumBy(Object.values(filteredData), ({ items }) => items.length) > 0;
 
   return (
@@ -44,6 +45,7 @@ const TokenSelectMenu = ({ erc20sort, erc1155sort, erc404sort, filteredData, onI
 
           const type = tokenType as TokenType;
           const arrowTransform =
+            (type === 'ERC-721' && erc721sort === 'desc') ||
             (type === 'ERC-1155' && erc1155sort === 'desc') ||
             (type === 'ERC-404' && erc404sort === 'desc') ||
             (type === 'ERC-20' && erc20sort === 'desc') ?
@@ -51,6 +53,8 @@ const TokenSelectMenu = ({ erc20sort, erc1155sort, erc404sort, filteredData, onI
               'rotate(-90deg)';
           const sortDirection: Sort = (() => {
             switch (type) {
+              case 'ERC-721':
+                return erc721sort;
               case 'ERC-1155':
                 return erc1155sort;
               case 'ERC-20':
@@ -62,6 +66,7 @@ const TokenSelectMenu = ({ erc20sort, erc1155sort, erc404sort, filteredData, onI
           const hasSort =
             (type === 'ERC-404' && tokenInfo.items.some(item => item.value)) ||
             type === 'ERC-1155' ||
+            (type === 'ERC-721' && tokenInfo.items.some(({ usd }) => usd)) ||
             (type === 'ERC-20' && tokenInfo.items.some(({ usd }) => usd));
           const numPrefix = tokenInfo.isOverflow ? '>' : '';
 
