@@ -18,6 +18,7 @@ import getQueryParamString from 'lib/router/getQueryParamString';
 import useEtherscanRedirects from 'lib/router/useEtherscanRedirects';
 import useSocketChannel from 'lib/socket/useSocketChannel';
 import useSocketMessage from 'lib/socket/useSocketMessage';
+import { useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import useFetchXStarScore from 'lib/xStarScore/useFetchXStarScore';
 import { ADDRESS_TABS_COUNTERS } from 'stubs/address';
 import { USER_OPS_ACCOUNT } from 'stubs/userOps';
@@ -89,6 +90,8 @@ const AddressPageContent = () => {
       placeholderData: ADDRESS_TABS_COUNTERS,
     },
   });
+
+  const lpQuery = useJuiceSwapPositions(hash);
 
   const countersQuery = useAddressCountersQuery({
     hash,
@@ -249,7 +252,7 @@ const AddressPageContent = () => {
       {
         id: 'tokens',
         title: 'Tokens',
-        count: addressTabsCountersQuery.data?.token_balances_count,
+        count: (addressTabsCountersQuery.data?.token_balances_count ?? 0) + (lpQuery.data?.length ?? 0),
         component: <AddressTokens shouldRender={ !isTabsLoading } isQueryEnabled={ areQueriesEnabled }/>,
         subTabs: TOKEN_TABS,
       },
@@ -310,6 +313,7 @@ const AddressPageContent = () => {
     mudTablesCountQuery.data,
     address3rdPartyWidgets,
     addressType,
+    lpQuery.data?.length,
   ]);
 
   const usernameApiTag = userPropfileApiQuery.data?.user_profile?.username;
