@@ -18,7 +18,7 @@ import getQueryParamString from 'lib/router/getQueryParamString';
 import useEtherscanRedirects from 'lib/router/useEtherscanRedirects';
 import useSocketChannel from 'lib/socket/useSocketChannel';
 import useSocketMessage from 'lib/socket/useSocketMessage';
-import { useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
+import { NFT_MANAGER, createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import useFetchXStarScore from 'lib/xStarScore/useFetchXStarScore';
 import { ADDRESS_TABS_COUNTERS } from 'stubs/address';
 import { USER_OPS_ACCOUNT } from 'stubs/userOps';
@@ -47,10 +47,12 @@ import AddressFavoriteButton from 'ui/address/details/AddressFavoriteButton';
 import AddressQrCode from 'ui/address/details/AddressQrCode';
 import AddressEnsDomains from 'ui/address/ensDomains/AddressEnsDomains';
 import SolidityscanReport from 'ui/address/SolidityscanReport';
+import { getTokensTotalInfo } from 'ui/address/utils/tokenUtils';
 import useAddressCountersQuery from 'ui/address/utils/useAddressCountersQuery';
 import useAddressQuery from 'ui/address/utils/useAddressQuery';
 import useCheckAddressFormat from 'ui/address/utils/useCheckAddressFormat';
 import useCheckDomainNameParam from 'ui/address/utils/useCheckDomainNameParam';
+import useFetchTokens from 'ui/address/utils/useFetchTokens';
 import AccountActionsMenu from 'ui/shared/AccountActionsMenu/AccountActionsMenu';
 import TextAd from 'ui/shared/ad/TextAd';
 import AddressAddToWallet from 'ui/shared/address/AddressAddToWallet';
@@ -92,6 +94,29 @@ const AddressPageContent = () => {
   });
 
   const lpQuery = useJuiceSwapPositions(hash);
+
+  const tokenQuery = useFetchTokens({
+    hash,
+    nativeExchangeRate: addressQuery.data?.exchange_rate,
+  });
+
+  const tokenCount = React.useMemo(() => {
+    if (!lpQuery.data?.length) {
+      return getTokensTotalInfo(tokenQuery.data).num;
+    }
+    const lpItems = createLpTokenBalances(lpQuery.data, addressQuery.data?.exchange_rate);
+    const filteredErc721 = tokenQuery.data['ERC-721'].items.filter(
+      item => item.token.address_hash.toLowerCase() !== NFT_MANAGER.toLowerCase(),
+    );
+    const dataWithLp = {
+      ...tokenQuery.data,
+      'ERC-721': {
+        ...tokenQuery.data['ERC-721'],
+        items: [ ...filteredErc721, ...lpItems ],
+      },
+    };
+    return getTokensTotalInfo(dataWithLp).num;
+  }, [ tokenQuery.data, lpQuery.data, addressQuery.data?.exchange_rate ]);
 
   const countersQuery = useAddressCountersQuery({
     hash,
@@ -252,7 +277,7 @@ const AddressPageContent = () => {
       {
         id: 'tokens',
         title: 'Tokens',
-        count: (addressTabsCountersQuery.data?.token_balances_count ?? 0) + (lpQuery.data?.length ? lpQuery.data.length - 1 : 0),
+        count: tokenCount,
         component: <AddressTokens shouldRender={ !isTabsLoading } isQueryEnabled={ areQueriesEnabled }/>,
         subTabs: TOKEN_TABS,
       },
@@ -313,7 +338,7 @@ const AddressPageContent = () => {
     mudTablesCountQuery.data,
     address3rdPartyWidgets,
     addressType,
-    lpQuery.data?.length,
+    tokenCount,
   ]);
 
   const usernameApiTag = userPropfileApiQuery.data?.user_profile?.username;
