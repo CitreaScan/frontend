@@ -13,6 +13,7 @@ import { useMultichainContext } from 'lib/contexts/multichain';
 import useIsMobile from 'lib/hooks/useIsMobile';
 import * as mixpanel from 'lib/mixpanel/index';
 import getQueryParamString from 'lib/router/getQueryParamString';
+import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
 import { createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { IconButton } from 'toolkit/chakra/icon-button';
 import { Link } from 'toolkit/chakra/link';
@@ -41,6 +42,7 @@ const TokenSelect = () => {
     nativeExchangeRate: addressQueryData?.exchange_rate,
   });
   const lpQuery = useJuiceSwapPositions(addressHash);
+  const { version: pricesVersion } = useTokenPrices();
 
   const dataWithLp = React.useMemo(() => {
     if (!lpQuery.data?.length) {
@@ -56,7 +58,8 @@ const TokenSelect = () => {
         items: [ ...data['ERC-20'].items, ...lpItems ],
       },
     };
-  }, [ data, lpQuery.data, addressQueryData?.exchange_rate ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- pricesVersion triggers recompute when vault prices load
+  }, [ data, lpQuery.data, addressQueryData?.exchange_rate, pricesVersion ]);
 
   const tokensResourceKey = getResourceKey('general:address_tokens', {
     pathParams: { hash: addressQueryData?.hash },

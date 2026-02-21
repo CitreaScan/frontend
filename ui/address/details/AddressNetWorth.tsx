@@ -60,7 +60,8 @@ const AddressNetWorth = ({ addressData, isLoading, addressHash }: Props) => {
     return items
       .map(item => calculateUsdValue(item, addressData?.exchange_rate))
       .reduce((sum, item) => item.usd ? sum.plus(item.usd) : sum, ZERO as BigNumber);
-  }, [ lpQuery.data, addressData?.exchange_rate ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- pricesVersion triggers recompute when vault prices load
+  }, [ lpQuery.data, addressData?.exchange_rate, pricesVersion ]);
 
   const { usd, isOverflow } = getTokensTotalInfo(data);
   const prefix = isOverflow ? '>' : '';
