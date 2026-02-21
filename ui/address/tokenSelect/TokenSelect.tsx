@@ -13,12 +13,14 @@ import { useMultichainContext } from 'lib/contexts/multichain';
 import useIsMobile from 'lib/hooks/useIsMobile';
 import * as mixpanel from 'lib/mixpanel/index';
 import getQueryParamString from 'lib/router/getQueryParamString';
+import { createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { IconButton } from 'toolkit/chakra/icon-button';
 import { Link } from 'toolkit/chakra/link';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import { Tooltip } from 'toolkit/chakra/tooltip';
 import IconSvg from 'ui/shared/IconSvg';
 
+import { calculateUsdValue } from '../utils/tokenUtils';
 import useFetchTokens from '../utils/useFetchTokens';
 import TokenSelectDesktop from './TokenSelectDesktop';
 import TokenSelectMobile from './TokenSelectMobile';
@@ -38,6 +40,24 @@ const TokenSelect = () => {
     hash: addressQueryData?.hash,
     nativeExchangeRate: addressQueryData?.exchange_rate,
   });
+  const lpQuery = useJuiceSwapPositions(addressHash);
+
+  const dataWithLp = React.useMemo(() => {
+    if (!lpQuery.data?.length) {
+      return data;
+    }
+    const nativeExchangeRate = addressQueryData?.exchange_rate;
+    const lpItems = createLpTokenBalances(lpQuery.data)
+      .map(item => calculateUsdValue(item, nativeExchangeRate));
+    return {
+      ...data,
+      'ERC-20': {
+        ...data['ERC-20'],
+        items: [ ...data['ERC-20'].items, ...lpItems ],
+      },
+    };
+  }, [ data, lpQuery.data, addressQueryData?.exchange_rate ]);
+
   const tokensResourceKey = getResourceKey('general:address_tokens', {
     pathParams: { hash: addressQueryData?.hash },
     queryParams: { type: 'ERC-20' },
@@ -59,7 +79,7 @@ const TokenSelect = () => {
     );
   }
 
-  const hasTokens = sumBy(Object.values(data), ({ items }) => items.length) > 0;
+  const hasTokens = sumBy(Object.values(dataWithLp), ({ items }) => items.length) > 0;
   if (isError || !hasTokens) {
     return <Box py="6px">0</Box>;
   }
@@ -67,8 +87,8 @@ const TokenSelect = () => {
   return (
     <Flex columnGap={ 3 } mt={{ base: 1, lg: 0 }}>
       { isMobile ?
-        <TokenSelectMobile data={ data } isLoading={ tokensIsFetching === 1 }/> :
-        <TokenSelectDesktop data={ data } isLoading={ tokensIsFetching === 1 }/>
+        <TokenSelectMobile data={ dataWithLp } isLoading={ tokensIsFetching === 1 }/> :
+        <TokenSelectDesktop data={ dataWithLp } isLoading={ tokensIsFetching === 1 }/>
       }
       <Tooltip content="Show all tokens">
         <Link
