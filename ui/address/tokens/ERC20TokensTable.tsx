@@ -25,9 +25,10 @@ const ERC20TokensTable = ({ data, top, isLoading }: Props) => {
         </TableRow>
       </TableHeaderSticky>
       <TableBody>
-        { data.map((item, index) => (
-          <ERC20TokensTableItem key={ item.token.address_hash + (isLoading ? index : '') } { ...item } isLoading={ isLoading }/>
-        )) }
+        { data.map((item, index) => {
+          const key = item.token.address_hash + (item.token_id ? `-${ item.token_id }` : '') + (isLoading ? index : '');
+          return <ERC20TokensTableItem key={ key } { ...item } isLoading={ isLoading }/>;
+        }) }
       </TableBody>
     </TableRoot>
   );

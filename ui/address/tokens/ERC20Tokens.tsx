@@ -1,7 +1,9 @@
 import { Box } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 import useIsMobile from 'lib/hooks/useIsMobile';
+import { createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import ActionBar from 'ui/shared/ActionBar';
 import DataListDisplay from 'ui/shared/DataListDisplay';
 import Pagination from 'ui/shared/pagination/Pagination';
@@ -16,8 +18,25 @@ type Props = {
 
 const ERC20Tokens = ({ tokensQuery }: Props) => {
   const isMobile = useIsMobile();
+  const router = useRouter();
+  const addressHash = router.query.hash?.toString();
 
   const { isError, isPlaceholderData, data, pagination } = tokensQuery;
+
+  const lpQuery = useJuiceSwapPositions(addressHash);
+  const lpItems = React.useMemo(() => {
+    if (!lpQuery.data?.length) {
+      return [];
+    }
+    return createLpTokenBalances(lpQuery.data);
+  }, [ lpQuery.data ]);
+
+  const allItems = React.useMemo(() => {
+    if (!data?.items) {
+      return undefined;
+    }
+    return lpItems.length > 0 ? [ ...data.items, ...lpItems ] : data.items;
+  }, [ data?.items, lpItems ]);
 
   const actionBar = isMobile && pagination.isVisible && (
     <ActionBar mt={ -6 }>
@@ -25,12 +44,12 @@ const ERC20Tokens = ({ tokensQuery }: Props) => {
     </ActionBar>
   );
 
-  const content = data?.items ? (
+  const content = allItems ? (
     <>
-      <Box hideBelow="lg"><ERC20TokensTable data={ data.items } top={ pagination.isVisible ? 72 : 0 } isLoading={ isPlaceholderData }/></Box>
-      <Box hideFrom="lg">{ data.items.map((item, index) => (
+      <Box hideBelow="lg"><ERC20TokensTable data={ allItems } top={ pagination.isVisible ? 72 : 0 } isLoading={ isPlaceholderData }/></Box>
+      <Box hideFrom="lg">{ allItems.map((item, index) => (
         <ERC20TokensListItem
-          key={ item.token.address_hash + (isPlaceholderData ? index : '') }
+          key={ item.token.address_hash + (item.token_id ? `-${ item.token_id }` : '') + (isPlaceholderData ? index : '') }
           { ...item }
           isLoading={ isPlaceholderData }
         />
@@ -42,7 +61,7 @@ const ERC20Tokens = ({ tokensQuery }: Props) => {
   return (
     <DataListDisplay
       isError={ isError }
-      itemsNum={ data?.items.length }
+      itemsNum={ allItems?.length }
       emptyText="There are no tokens of selected type."
       actionBar={ actionBar }
     >

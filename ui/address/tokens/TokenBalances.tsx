@@ -1,17 +1,19 @@
 import { Flex } from '@chakra-ui/react';
+import type BigNumber from 'bignumber.js';
 import { useRouter } from 'next/router';
 import React from 'react';
 
 import config from 'configs/app';
 import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { currencyUnits } from 'lib/units';
 import { ZERO } from 'toolkit/utils/consts';
 import DataFetchAlert from 'ui/shared/DataFetchAlert';
 import IconSvg from 'ui/shared/IconSvg';
 import NativeTokenIcon from 'ui/shared/NativeTokenIcon';
 
-import { getTokensTotalInfo } from '../utils/tokenUtils';
+import { calculateUsdValue, getTokensTotalInfo } from '../utils/tokenUtils';
 import useFetchTokens from '../utils/useFetchTokens';
 import TokenBalancesItem from './TokenBalancesItem';
 
@@ -30,6 +32,19 @@ const TokenBalances = () => {
     nativeExchangeRate: addressQuery.data?.exchange_rate,
   });
 
+  const lpQuery = useJuiceSwapPositions(hash);
+
+  const lpUsd = React.useMemo(() => {
+    if (!lpQuery.data?.length) {
+      return ZERO;
+    }
+    const nativeExchangeRate = addressQuery.data?.exchange_rate;
+    const items = createLpTokenBalances(lpQuery.data);
+    return items
+      .map(item => calculateUsdValue(item, nativeExchangeRate))
+      .reduce((sum, item) => item.usd ? sum.plus(item.usd) : sum, ZERO as BigNumber);
+  }, [ lpQuery.data, addressQuery.data?.exchange_rate ]);
+
   if (addressQuery.isError || tokenQuery.isError) {
     return <DataFetchAlert/>;
   }
@@ -45,7 +60,7 @@ const TokenBalances = () => {
 
   const tokensInfo = getTokensTotalInfo(tokenQuery.data);
   const prefix = tokensInfo.isOverflow ? '>' : '';
-  const totalUsd = nativeUsd.plus(tokensInfo.usd);
+  const totalUsd = nativeUsd.plus(tokensInfo.usd).plus(lpUsd);
   const tokensNumText = tokensInfo.num > 0 ?
     `${ prefix }${ tokensInfo.num } ${ tokensInfo.num > 1 ? 'tokens' : 'token' }` :
     '0';
