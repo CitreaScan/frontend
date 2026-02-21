@@ -122,38 +122,37 @@ async function fetchJuiceSwapPositions(
       const tickUpper = Number(tickUpperRaw >= INT256_MAX ? tickUpperRaw - UINT256_RANGE : tickUpperRaw);
       const liquidity = parseFloat(BigInt('0x' + fields[7]).toString());
 
-      if (liquidity === 0) {
-        continue;
-      }
-
-      // 4. getPool(token0, token1, fee) -> pool address, then slot0() for sqrtPriceX96
-      const poolKey = `${ token0 }-${ token1 }-${ fee }`;
-      if (!poolCache[poolKey]) {
-        const poolResult = await rpcCall(
-          rpcUrl, FACTORY,
-          GET_POOL + padAddress(token0) + padAddress(token1) + padUint256(fee),
-        );
-        const poolAddr = '0x' + poolResult.slice(26);
-        const slot0Result = await rpcCall(rpcUrl, poolAddr, SLOT0);
-        poolCache[poolKey] = BigInt('0x' + slot0Result.slice(2, 66));
-      }
-      const sqrtPriceX96 = Number(poolCache[poolKey]);
-
-      // 5. Uniswap V3 math to calculate token amounts from liquidity
-      const sqrtRatioA = Math.sqrt(1.0001 ** tickLower);
-      const sqrtRatioB = Math.sqrt(1.0001 ** tickUpper);
-      const sqrtPrice = sqrtPriceX96 / (2 ** 96);
-      const currentTick = Math.log(sqrtPrice ** 2) / Math.log(1.0001);
-
       let amount0 = 0;
       let amount1 = 0;
-      if (currentTick <= tickLower) {
-        amount0 = liquidity * ((sqrtRatioB - sqrtRatioA) / (sqrtRatioA * sqrtRatioB));
-      } else if (currentTick > tickUpper) {
-        amount1 = liquidity * (sqrtRatioB - sqrtRatioA);
-      } else {
-        amount0 = liquidity * ((sqrtRatioB - sqrtPrice) / (sqrtPrice * sqrtRatioB));
-        amount1 = liquidity * (sqrtPrice - sqrtRatioA);
+
+      if (liquidity > 0) {
+        // 4. getPool(token0, token1, fee) -> pool address, then slot0() for sqrtPriceX96
+        const poolKey = `${ token0 }-${ token1 }-${ fee }`;
+        if (!poolCache[poolKey]) {
+          const poolResult = await rpcCall(
+            rpcUrl, FACTORY,
+            GET_POOL + padAddress(token0) + padAddress(token1) + padUint256(fee),
+          );
+          const poolAddr = '0x' + poolResult.slice(26);
+          const slot0Result = await rpcCall(rpcUrl, poolAddr, SLOT0);
+          poolCache[poolKey] = BigInt('0x' + slot0Result.slice(2, 66));
+        }
+        const sqrtPriceX96 = Number(poolCache[poolKey]);
+
+        // 5. Uniswap V3 math to calculate token amounts from liquidity
+        const sqrtRatioA = Math.sqrt(1.0001 ** tickLower);
+        const sqrtRatioB = Math.sqrt(1.0001 ** tickUpper);
+        const sqrtPrice = sqrtPriceX96 / (2 ** 96);
+        const currentTick = Math.log(sqrtPrice ** 2) / Math.log(1.0001);
+
+        if (currentTick <= tickLower) {
+          amount0 = liquidity * ((sqrtRatioB - sqrtRatioA) / (sqrtRatioA * sqrtRatioB));
+        } else if (currentTick > tickUpper) {
+          amount1 = liquidity * (sqrtRatioB - sqrtRatioA);
+        } else {
+          amount0 = liquidity * ((sqrtRatioB - sqrtPrice) / (sqrtPrice * sqrtRatioB));
+          amount1 = liquidity * (sqrtPrice - sqrtRatioA);
+        }
       }
 
       positions.push({

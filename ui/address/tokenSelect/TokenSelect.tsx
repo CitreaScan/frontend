@@ -14,7 +14,7 @@ import useIsMobile from 'lib/hooks/useIsMobile';
 import * as mixpanel from 'lib/mixpanel/index';
 import getQueryParamString from 'lib/router/getQueryParamString';
 import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
-import { createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
+import { NFT_MANAGER, createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { IconButton } from 'toolkit/chakra/icon-button';
 import { Link } from 'toolkit/chakra/link';
 import { Skeleton } from 'toolkit/chakra/skeleton';
@@ -49,11 +49,15 @@ const TokenSelect = () => {
     }
     const nativeExchangeRate = addressQueryData?.exchange_rate;
     const lpItems = createLpTokenBalances(lpQuery.data, nativeExchangeRate);
+    // Replace the generic NFT Manager entry with individual LP items
+    const filteredErc721 = data['ERC-721'].items.filter(
+      item => item.token.address_hash.toLowerCase() !== NFT_MANAGER.toLowerCase(),
+    );
     return {
       ...data,
       'ERC-721': {
         ...data['ERC-721'],
-        items: [ ...data['ERC-721'].items, ...lpItems ],
+        items: [ ...filteredErc721, ...lpItems ],
       },
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- pricesVersion triggers recompute when vault prices load
