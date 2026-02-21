@@ -18,7 +18,7 @@ import getQueryParamString from 'lib/router/getQueryParamString';
 import useEtherscanRedirects from 'lib/router/useEtherscanRedirects';
 import useSocketChannel from 'lib/socket/useSocketChannel';
 import useSocketMessage from 'lib/socket/useSocketMessage';
-import { NFT_MANAGER, createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
+import { useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import useFetchXStarScore from 'lib/xStarScore/useFetchXStarScore';
 import { ADDRESS_TABS_COUNTERS } from 'stubs/address';
 import { USER_OPS_ACCOUNT } from 'stubs/userOps';
@@ -53,6 +53,7 @@ import useAddressQuery from 'ui/address/utils/useAddressQuery';
 import useCheckAddressFormat from 'ui/address/utils/useCheckAddressFormat';
 import useCheckDomainNameParam from 'ui/address/utils/useCheckDomainNameParam';
 import useFetchTokens from 'ui/address/utils/useFetchTokens';
+import { useLpEnhancedTokenData } from 'ui/address/utils/useLpEnhancedTokenData';
 import AccountActionsMenu from 'ui/shared/AccountActionsMenu/AccountActionsMenu';
 import TextAd from 'ui/shared/ad/TextAd';
 import AddressAddToWallet from 'ui/shared/address/AddressAddToWallet';
@@ -100,23 +101,8 @@ const AddressPageContent = () => {
     nativeExchangeRate: addressQuery.data?.exchange_rate,
   });
 
-  const tokenCount = React.useMemo(() => {
-    if (!lpQuery.data?.length) {
-      return getTokensTotalInfo(tokenQuery.data).num;
-    }
-    const lpItems = createLpTokenBalances(lpQuery.data, addressQuery.data?.exchange_rate);
-    const filteredErc721 = tokenQuery.data['ERC-721'].items.filter(
-      item => item.token.address_hash.toLowerCase() !== NFT_MANAGER.toLowerCase(),
-    );
-    const dataWithLp = {
-      ...tokenQuery.data,
-      'ERC-721': {
-        ...tokenQuery.data['ERC-721'],
-        items: [ ...filteredErc721, ...lpItems ],
-      },
-    };
-    return getTokensTotalInfo(dataWithLp).num;
-  }, [ tokenQuery.data, lpQuery.data, addressQuery.data?.exchange_rate ]);
+  const dataWithLp = useLpEnhancedTokenData(tokenQuery.data, lpQuery.data, addressQuery.data?.exchange_rate);
+  const tokenCount = getTokensTotalInfo(dataWithLp).num;
 
   const countersQuery = useAddressCountersQuery({
     hash,

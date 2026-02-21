@@ -1,6 +1,5 @@
 import { Grid } from '@chakra-ui/react';
 import { useQueryClient } from '@tanstack/react-query';
-import type BigNumber from 'bignumber.js';
 import { useRouter } from 'next/router';
 import React from 'react';
 
@@ -11,14 +10,14 @@ import { getResourceKey } from 'lib/api/useApiQuery';
 import { useMultichainContext } from 'lib/contexts/multichain';
 import useIsMobile from 'lib/hooks/useIsMobile';
 import getQueryParamString from 'lib/router/getQueryParamString';
-import { useTokenPrices } from 'lib/token/TokenPricesInitializer';
-import { NFT_MANAGER, createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
+import { NFT_MANAGER, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { apos } from 'toolkit/utils/htmlEntities';
 import ActionBar from 'ui/shared/ActionBar';
 import DataListDisplay from 'ui/shared/DataListDisplay';
 import Pagination from 'ui/shared/pagination/Pagination';
 import type { QueryWithPagesResult } from 'ui/shared/pagination/useQueryWithPages';
 
+import { useLpUsdMap } from '../utils/useLpEnhancedTokenData';
 import AddressNftTypeFilter from './AddressNftTypeFilter';
 import NFTItem from './NFTItem';
 
@@ -40,22 +39,7 @@ const AddressNFTs = ({ tokensQuery, tokenTypes, onTokenTypesChange }: Props) => 
   const addressResourceKey = getResourceKey('general:address', { pathParams: { hash: addressHash } });
   const addressData = queryClient.getQueryData<Address>(addressResourceKey);
   const lpQuery = useJuiceSwapPositions(addressHash);
-  const { version: pricesVersion } = useTokenPrices();
-
-  const lpUsdMap = React.useMemo(() => {
-    if (!lpQuery.data?.length) {
-      return {} as Record<string, BigNumber>;
-    }
-    const balances = createLpTokenBalances(lpQuery.data, addressData?.exchange_rate);
-    const map: Record<string, BigNumber> = {};
-    for (let i = 0; i < lpQuery.data.length; i++) {
-      if (balances[i].usd) {
-        map[lpQuery.data[i].tokenId.toString()] = balances[i].usd!;
-      }
-    }
-    return map;
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- pricesVersion triggers recompute when vault prices load
-  }, [ lpQuery.data, addressData?.exchange_rate, pricesVersion ]);
+  const lpUsdMap = useLpUsdMap(lpQuery.data, addressData?.exchange_rate);
 
   const hasActiveFilters = Boolean(tokenTypes?.length);
 

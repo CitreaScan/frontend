@@ -37,7 +37,15 @@ const TokenInstanceLPPosition = ({ tokenHash, tokenId, isLoading: parentLoading 
   const data = positionQuery.data;
 
   if (positionQuery.isError) {
-    return null;
+    return (
+      <>
+        <DetailedInfo.ItemDivider/>
+        <DetailedInfo.ItemLabel>LP Position</DetailedInfo.ItemLabel>
+        <DetailedInfo.ItemValue>
+          <Text color="text.secondary">Failed to load LP position data</Text>
+        </DetailedInfo.ItemValue>
+      </>
+    );
   }
 
   const feePercent = data ? (data.fee / 10000).toFixed(data.fee % 10000 === 0 ? 1 : 2) + '%' : '';

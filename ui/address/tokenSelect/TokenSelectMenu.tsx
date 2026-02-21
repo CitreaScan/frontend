@@ -57,6 +57,8 @@ const TokenSelectMenu = ({ erc20sort, erc721sort, erc1155sort, erc404sort, filte
                 return erc721sort;
               case 'ERC-1155':
                 return erc1155sort;
+              case 'ERC-404':
+                return erc404sort;
               case 'ERC-20':
                 return erc20sort;
               default:
