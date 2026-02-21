@@ -21,7 +21,6 @@ import { Skeleton } from 'toolkit/chakra/skeleton';
 import { Tooltip } from 'toolkit/chakra/tooltip';
 import IconSvg from 'ui/shared/IconSvg';
 
-import { calculateUsdValue } from '../utils/tokenUtils';
 import useFetchTokens from '../utils/useFetchTokens';
 import TokenSelectDesktop from './TokenSelectDesktop';
 import TokenSelectMobile from './TokenSelectMobile';
@@ -49,13 +48,12 @@ const TokenSelect = () => {
       return data;
     }
     const nativeExchangeRate = addressQueryData?.exchange_rate;
-    const lpItems = createLpTokenBalances(lpQuery.data, nativeExchangeRate)
-      .map(item => calculateUsdValue(item, nativeExchangeRate));
+    const lpItems = createLpTokenBalances(lpQuery.data, nativeExchangeRate);
     return {
       ...data,
-      'ERC-20': {
-        ...data['ERC-20'],
-        items: [ ...data['ERC-20'].items, ...lpItems ],
+      'ERC-721': {
+        ...data['ERC-721'],
+        items: [ ...data['ERC-721'].items, ...lpItems ],
       },
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- pricesVersion triggers recompute when vault prices load

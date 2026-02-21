@@ -14,7 +14,7 @@ import { Skeleton } from 'toolkit/chakra/skeleton';
 import { ZERO } from 'toolkit/utils/consts';
 import TextSeparator from 'ui/shared/TextSeparator';
 
-import { calculateUsdValue, getTokensTotalInfo } from '../utils/tokenUtils';
+import { getTokensTotalInfo } from '../utils/tokenUtils';
 import useFetchTokens from '../utils/useFetchTokens';
 import AddressMultichainButton from './AddressMultichainButton';
 
@@ -58,7 +58,6 @@ const AddressNetWorth = ({ addressData, isLoading, addressHash }: Props) => {
     }
     const items = createLpTokenBalances(lpQuery.data, addressData?.exchange_rate);
     return items
-      .map(item => calculateUsdValue(item, addressData?.exchange_rate))
       .reduce((sum, item) => item.usd ? sum.plus(item.usd) : sum, ZERO as BigNumber);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- pricesVersion triggers recompute when vault prices load
   }, [ lpQuery.data, addressData?.exchange_rate, pricesVersion ]);

@@ -29,9 +29,6 @@ const TokenSelectItem = ({ data }: Props) => {
   const secondRow = (() => {
     switch (data.token.type) {
       case 'ERC-20': {
-        if (isLpItem) {
-          return <TruncatedValue value="LP Position"/>;
-        }
         const tokenDecimals = Number(data.token.decimals ?? 18);
         const text = `${ BigNumber(data.value).dividedBy(10 ** tokenDecimals).dp(8).toFormat() } ${ data.token.symbol || '' }`;
 
@@ -43,6 +40,9 @@ const TokenSelectItem = ({ data }: Props) => {
         );
       }
       case 'ERC-721': {
+        if (isLpItem) {
+          return <TruncatedValue value="LP Position"/>;
+        }
         const text = `${ BigNumber(data.value).toFormat() } ${ data.token.symbol || '' }`;
         return <TruncatedValue value={ text }/>;
       }

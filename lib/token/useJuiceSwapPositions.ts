@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import BigNumber from 'bignumber.js';
 
 import type { AddressTokenBalance } from 'types/api/address';
 
@@ -172,14 +173,13 @@ async function fetchJuiceSwapPositions(
 }
 
 /**
- * Creates virtual AddressTokenBalance items from JuiceSwap LP positions.
- * Each position produces 1 item with the combined USD value of both tokens.
- * value is set to "1" (1 NFT) and exchange_rate holds the total USD value.
+ * Creates virtual token balance items from JuiceSwap LP positions.
+ * Each position produces 1 ERC-721 item with the combined USD value.
  */
 export function createLpTokenBalances(
   positions: Array<JuiceSwapPosition>,
   nativeExchangeRate?: string | null,
-): Array<AddressTokenBalance> {
+): Array<AddressTokenBalance & { usd?: BigNumber }> {
   return positions.map((pos) => {
     const rate0 = getEffectiveExchangeRate(pos.token0Address, null, nativeExchangeRate);
     const rate1 = getEffectiveExchangeRate(pos.token1Address, null, nativeExchangeRate);
@@ -191,12 +191,12 @@ export function createLpTokenBalances(
     return {
       token: {
         address_hash: NFT_MANAGER,
-        type: 'ERC-20' as const,
+        type: 'ERC-721' as const,
         symbol: null,
         name: `JuiceSwap LP #${ pos.tokenId }`,
         decimals: '0',
         holders_count: null,
-        exchange_rate: totalUsd > 0 ? totalUsd.toFixed(2) : null,
+        exchange_rate: null,
         total_supply: null,
         icon_url: null,
         circulating_market_cap: null,
@@ -205,6 +205,7 @@ export function createLpTokenBalances(
       token_id: `lp-${ pos.tokenId }`,
       value: '1',
       token_instance: null,
+      usd: totalUsd > 0 ? new BigNumber(totalUsd) : undefined,
     };
   });
 }
