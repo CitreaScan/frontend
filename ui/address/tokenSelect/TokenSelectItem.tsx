@@ -41,7 +41,7 @@ const TokenSelectItem = ({ data }: Props) => {
       }
       case 'ERC-721': {
         if (isLpItem) {
-          return <TruncatedValue value="LP Position"/>;
+          return <TruncatedValue value={ data.token.symbol || 'LP Position' }/>;
         }
         const text = `${ BigNumber(data.value).toFormat() } ${ data.token.symbol || '' }`;
         return <TruncatedValue value={ text }/>;

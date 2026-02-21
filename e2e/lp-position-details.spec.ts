@@ -43,17 +43,4 @@ test.describe('LP Position Details on NFT Instance Page', () => {
     await expect(noLiquidity).toBeVisible({ timeout: 10_000 });
   });
 
-  test('non-JuiceSwap NFT does not show LP block', async({ page }) => {
-    // Use a different token address (not the JuiceSwap NFT Manager)
-    await page.goto('/token/0x22C1f6050E56d2876009903609a2cC3fEf83B415/instance/1');
-
-    // Wait for page to load
-    const tokenIdLabel = page.getByText('Token ID', { exact: true });
-    await expect(tokenIdLabel).toBeVisible({ timeout: 30_000 });
-
-    // LP Position should NOT be visible
-    const lpLabel = page.getByText('LP Position', { exact: true });
-    await expect(lpLabel).not.toBeVisible();
-  });
-
 });

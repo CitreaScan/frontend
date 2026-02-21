@@ -32,6 +32,8 @@ export interface JuiceSwapPosition {
   token1Address: string;
   amount0Wei: string;
   amount1Wei: string;
+  token0Symbol: string;
+  token1Symbol: string;
 }
 
 export interface JuiceSwapPositionDetail extends JuiceSwapPosition {
@@ -87,6 +89,7 @@ async function fetchJuiceSwapPositions(
 
   const positions: Array<JuiceSwapPosition> = [];
   const poolCache: Record<string, bigint> = {};
+  const symbolCache: Record<string, string> = {};
   const ownerPad = padAddress(address);
 
   for (let i = 0; i < nftCount; i++) {
@@ -112,6 +115,14 @@ async function fetchJuiceSwapPositions(
       const token0 = '0x' + fields[2].slice(24);
       const token1 = '0x' + fields[3].slice(24);
       const fee = parseInt(fields[4], 16);
+
+      // Fetch token symbols (cached per address)
+      if (!symbolCache[token0]) {
+        symbolCache[token0] = decodeString(await rpcCall(rpcUrl, token0, SYMBOL_SELECTOR)) || token0.slice(0, 10);
+      }
+      if (!symbolCache[token1]) {
+        symbolCache[token1] = decodeString(await rpcCall(rpcUrl, token1, SYMBOL_SELECTOR)) || token1.slice(0, 10);
+      }
 
       // Decode signed int256 ticks
       const INT256_MAX = BigInt(1) << BigInt(255);
@@ -161,6 +172,8 @@ async function fetchJuiceSwapPositions(
         token1Address: token1,
         amount0Wei: BigInt(Math.round(amount0)).toString(),
         amount1Wei: BigInt(Math.round(amount1)).toString(),
+        token0Symbol: symbolCache[token0],
+        token1Symbol: symbolCache[token1],
       });
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -191,7 +204,7 @@ export function createLpTokenBalances(
       token: {
         address_hash: NFT_MANAGER,
         type: 'ERC-721' as const,
-        symbol: null,
+        symbol: `${ pos.token0Symbol } + ${ pos.token1Symbol }`,
         name: `JuiceSwap LP #${ pos.tokenId }`,
         decimals: '0',
         holders_count: null,
