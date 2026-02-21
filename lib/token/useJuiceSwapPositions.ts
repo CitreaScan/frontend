@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { AddressTokenBalance } from 'types/api/address';
 
 import config from 'configs/app';
+import { getEffectiveExchangeRate } from 'lib/token/stablecoins';
 
 // JuiceSwap V3 contracts on Citrea (hardcoded)
 const NFT_MANAGER = '0x3D3821D358f56395d4053954f98aec0E1F0fa568';
@@ -172,47 +173,40 @@ async function fetchJuiceSwapPositions(
 
 /**
  * Creates virtual AddressTokenBalance items from JuiceSwap LP positions.
- * Each position produces 2 items (one per token in the pair).
+ * Each position produces 1 item with the combined USD value of both tokens.
+ * value is set to "1" (1 NFT) and exchange_rate holds the total USD value.
  */
-export function createLpTokenBalances(positions: Array<JuiceSwapPosition>): Array<AddressTokenBalance> {
-  return positions.flatMap((pos) => [
-    {
+export function createLpTokenBalances(
+  positions: Array<JuiceSwapPosition>,
+  nativeExchangeRate?: string | null,
+): Array<AddressTokenBalance> {
+  return positions.map((pos) => {
+    const rate0 = getEffectiveExchangeRate(pos.token0Address, null, nativeExchangeRate);
+    const rate1 = getEffectiveExchangeRate(pos.token1Address, null, nativeExchangeRate);
+    const decimals = 18;
+    const usd0 = rate0 ? parseFloat(pos.amount0Wei) / (10 ** decimals) * parseFloat(rate0) : 0;
+    const usd1 = rate1 ? parseFloat(pos.amount1Wei) / (10 ** decimals) * parseFloat(rate1) : 0;
+    const totalUsd = usd0 + usd1;
+
+    return {
       token: {
-        address_hash: pos.token0Address,
+        address_hash: NFT_MANAGER,
         type: 'ERC-20' as const,
-        symbol: 'JUSD',
+        symbol: null,
         name: `JuiceSwap LP #${ pos.tokenId }`,
-        decimals: '18',
+        decimals: '0',
         holders_count: null,
-        exchange_rate: null,
+        exchange_rate: totalUsd > 0 ? totalUsd.toFixed(2) : null,
         total_supply: null,
         icon_url: null,
         circulating_market_cap: null,
         reputation: null,
       },
-      token_id: `lp-${ pos.tokenId }-0`,
-      value: pos.amount0Wei,
+      token_id: `lp-${ pos.tokenId }`,
+      value: '1',
       token_instance: null,
-    },
-    {
-      token: {
-        address_hash: pos.token1Address,
-        type: 'ERC-20' as const,
-        symbol: 'WCBTC',
-        name: `JuiceSwap LP #${ pos.tokenId }`,
-        decimals: '18',
-        holders_count: null,
-        exchange_rate: null,
-        total_supply: null,
-        icon_url: null,
-        circulating_market_cap: null,
-        reputation: null,
-      },
-      token_id: `lp-${ pos.tokenId }-1`,
-      value: pos.amount1Wei,
-      token_instance: null,
-    },
-  ]);
+    };
+  });
 }
 
 export function useJuiceSwapPositions(addressHash?: string) {

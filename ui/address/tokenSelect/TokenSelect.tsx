@@ -49,7 +49,7 @@ const TokenSelect = () => {
       return data;
     }
     const nativeExchangeRate = addressQueryData?.exchange_rate;
-    const lpItems = createLpTokenBalances(lpQuery.data)
+    const lpItems = createLpTokenBalances(lpQuery.data, nativeExchangeRate)
       .map(item => calculateUsdValue(item, nativeExchangeRate));
     return {
       ...data,

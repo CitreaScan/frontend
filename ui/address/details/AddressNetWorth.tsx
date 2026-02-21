@@ -56,7 +56,7 @@ const AddressNetWorth = ({ addressData, isLoading, addressHash }: Props) => {
     if (!lpQuery.data?.length) {
       return ZERO;
     }
-    const items = createLpTokenBalances(lpQuery.data);
+    const items = createLpTokenBalances(lpQuery.data, addressData?.exchange_rate);
     return items
       .map(item => calculateUsdValue(item, addressData?.exchange_rate))
       .reduce((sum, item) => item.usd ? sum.plus(item.usd) : sum, ZERO as BigNumber);
