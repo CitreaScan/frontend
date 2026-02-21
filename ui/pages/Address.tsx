@@ -252,7 +252,7 @@ const AddressPageContent = () => {
       {
         id: 'tokens',
         title: 'Tokens',
-        count: (addressTabsCountersQuery.data?.token_balances_count ?? 0) + (lpQuery.data?.length ?? 0),
+        count: (addressTabsCountersQuery.data?.token_balances_count ?? 0) + (lpQuery.data?.length ? lpQuery.data.length - 1 : 0),
         component: <AddressTokens shouldRender={ !isTabsLoading } isQueryEnabled={ areQueriesEnabled }/>,
         subTabs: TOKEN_TABS,
       },
