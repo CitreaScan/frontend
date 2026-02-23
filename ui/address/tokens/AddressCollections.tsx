@@ -1,12 +1,16 @@
 import { Box, Flex, Text, Grid, HStack } from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 
+import type { Address } from 'types/api/address';
 import type { NFTTokenType } from 'types/api/token';
 
 import { route } from 'nextjs/routes';
 
+import { getResourceKey } from 'lib/api/useApiQuery';
 import { useMultichainContext } from 'lib/contexts/multichain';
 import useIsMobile from 'lib/hooks/useIsMobile';
+import { NFT_MANAGER, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { Link } from 'toolkit/chakra/link';
 import { Skeleton } from 'toolkit/chakra/skeleton';
 import { apos } from 'toolkit/utils/htmlEntities';
@@ -17,6 +21,7 @@ import NftFallback from 'ui/shared/nft/NftFallback';
 import Pagination from 'ui/shared/pagination/Pagination';
 import type { QueryWithPagesResult } from 'ui/shared/pagination/useQueryWithPages';
 
+import { useLpUsdMap } from '../utils/useLpEnhancedTokenData';
 import AddressNftTypeFilter from './AddressNftTypeFilter';
 import NFTItem from './NFTItem';
 import NFTItemContainer from './NFTItemContainer';
@@ -31,8 +36,14 @@ type Props = {
 const AddressCollections = ({ collectionsQuery, address, tokenTypes, onTokenTypesChange }: Props) => {
   const isMobile = useIsMobile();
   const multichainContext = useMultichainContext();
+  const queryClient = useQueryClient();
 
   const { isError, isPlaceholderData, data, pagination } = collectionsQuery;
+
+  const addressResourceKey = getResourceKey('general:address', { pathParams: { hash: address } });
+  const addressData = queryClient.getQueryData<Address>(addressResourceKey);
+  const lpQuery = useJuiceSwapPositions(address);
+  const lpUsdMap = useLpUsdMap(lpQuery.data, addressData?.exchange_rate);
 
   const hasActiveFilters = Boolean(tokenTypes?.length);
 
@@ -54,6 +65,7 @@ const AddressCollections = ({ collectionsQuery, address, tokenTypes, onTokenType
       },
     }, multichainContext);
     const hasOverload = Number(item.amount) > item.token_instances.length;
+    const isJuiceSwap = item.token.address_hash.toLowerCase() === NFT_MANAGER.toLowerCase();
     return (
       <Box key={ item.token.address_hash + index } mb={ 6 }>
         <Flex mb={ 3 } flexWrap="wrap" lineHeight="30px">
@@ -89,6 +101,7 @@ const AddressCollections = ({ collectionsQuery, address, tokenTypes, onTokenType
                 { ...instance }
                 token={ item.token }
                 isLoading={ isPlaceholderData }
+                usdValue={ isJuiceSwap && instance.id ? lpUsdMap[instance.id] : undefined }
               />
             );
           }) }

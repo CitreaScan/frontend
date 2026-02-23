@@ -1,4 +1,5 @@
 import { Text, Flex } from '@chakra-ui/react';
+import type BigNumber from 'bignumber.js';
 import React from 'react';
 
 import type { Address } from 'types/api/address';
@@ -7,8 +8,10 @@ import config from 'configs/app';
 import getCurrencyValue from 'lib/getCurrencyValue';
 import * as mixpanel from 'lib/mixpanel/index';
 import { useEquityPrices } from 'lib/token/useEquityPrices';
+import { createLpTokenBalances, useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { useVaultPrices } from 'lib/token/useVaultPrices';
 import { Skeleton } from 'toolkit/chakra/skeleton';
+import { ZERO } from 'toolkit/utils/consts';
 import TextSeparator from 'ui/shared/TextSeparator';
 
 import { getTokensTotalInfo } from '../utils/tokenUtils';
@@ -47,10 +50,22 @@ const AddressNetWorth = ({ addressData, isLoading, addressHash }: Props) => {
     decimals: String(config.chain.currency.decimals),
   });
 
+  const lpQuery = useJuiceSwapPositions(addressData?.hash);
+
+  const lpUsd = React.useMemo(() => {
+    if (!lpQuery.data?.length) {
+      return ZERO;
+    }
+    const items = createLpTokenBalances(lpQuery.data, addressData?.exchange_rate);
+    return items
+      .reduce((sum, item) => item.usd ? sum.plus(item.usd) : sum, ZERO as BigNumber);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- pricesVersion triggers recompute when vault prices load
+  }, [ lpQuery.data, addressData?.exchange_rate, pricesVersion ]);
+
   const { usd, isOverflow } = getTokensTotalInfo(data);
   const prefix = isOverflow ? '>' : '';
 
-  const totalUsd = nativeUsd.plus(usd);
+  const totalUsd = nativeUsd.plus(usd).plus(lpUsd);
 
   const onMultichainClick = React.useCallback(() => {
     mixpanel.logEvent(mixpanel.EventTypes.BUTTON_CLICK, { Content: 'Multichain', Source: 'address' });

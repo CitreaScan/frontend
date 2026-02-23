@@ -1,4 +1,5 @@
 import { Flex, Text } from '@chakra-ui/react';
+import type BigNumber from 'bignumber.js';
 import React from 'react';
 
 import type { AddressNFT } from 'types/api/address';
@@ -17,9 +18,9 @@ import NftMedia from 'ui/shared/nft/NftMedia';
 
 import NFTItemContainer from './NFTItemContainer';
 
-type Props = AddressNFT & { isLoading: boolean; withTokenLink?: boolean; chain?: ChainConfig };
+type Props = AddressNFT & { isLoading: boolean; withTokenLink?: boolean; chain?: ChainConfig; usdValue?: BigNumber };
 
-const NFTItem = ({ token, value, isLoading, withTokenLink, chain, ...tokenInstance }: Props) => {
+const NFTItem = ({ token, value, isLoading, withTokenLink, chain, usdValue, ...tokenInstance }: Props) => {
   const valueResult = token.decimals && value ? getCurrencyValue({ value, decimals: token.decimals, accuracy: 2 }).valueStr : value;
   const tokenInstanceLink = tokenInstance.id ?
     route({ pathname: '/token/[hash]/instance/[id]', query: { hash: token.address_hash, id: tokenInstance.id } }) :
@@ -45,7 +46,9 @@ const NFTItem = ({ token, value, isLoading, withTokenLink, chain, ...tokenInstan
           <NftEntity hash={ token.address_hash } id={ tokenInstance.id } isLoading={ isLoading } noIcon/>
         </Flex>
         <Skeleton loading={ isLoading } overflow="hidden" ml={ 1 }>
-          { valueResult && (
+          { usdValue ? (
+            <Text fontWeight={ 600 }>{ `$${ usdValue.toFormat(2) }` }</Text>
+          ) : valueResult && (
             <Flex>
               <Text color="text.secondary" whiteSpace="pre">Qty </Text>
               <Text overflow="hidden" wordBreak="break-all">{ valueResult }</Text>

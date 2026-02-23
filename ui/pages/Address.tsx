@@ -18,6 +18,7 @@ import getQueryParamString from 'lib/router/getQueryParamString';
 import useEtherscanRedirects from 'lib/router/useEtherscanRedirects';
 import useSocketChannel from 'lib/socket/useSocketChannel';
 import useSocketMessage from 'lib/socket/useSocketMessage';
+import { useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import useFetchXStarScore from 'lib/xStarScore/useFetchXStarScore';
 import { ADDRESS_TABS_COUNTERS } from 'stubs/address';
 import { USER_OPS_ACCOUNT } from 'stubs/userOps';
@@ -46,10 +47,13 @@ import AddressFavoriteButton from 'ui/address/details/AddressFavoriteButton';
 import AddressQrCode from 'ui/address/details/AddressQrCode';
 import AddressEnsDomains from 'ui/address/ensDomains/AddressEnsDomains';
 import SolidityscanReport from 'ui/address/SolidityscanReport';
+import { getTokensTotalInfo } from 'ui/address/utils/tokenUtils';
 import useAddressCountersQuery from 'ui/address/utils/useAddressCountersQuery';
 import useAddressQuery from 'ui/address/utils/useAddressQuery';
 import useCheckAddressFormat from 'ui/address/utils/useCheckAddressFormat';
 import useCheckDomainNameParam from 'ui/address/utils/useCheckDomainNameParam';
+import useFetchTokens from 'ui/address/utils/useFetchTokens';
+import { useLpEnhancedTokenData } from 'ui/address/utils/useLpEnhancedTokenData';
 import AccountActionsMenu from 'ui/shared/AccountActionsMenu/AccountActionsMenu';
 import TextAd from 'ui/shared/ad/TextAd';
 import AddressAddToWallet from 'ui/shared/address/AddressAddToWallet';
@@ -89,6 +93,16 @@ const AddressPageContent = () => {
       placeholderData: ADDRESS_TABS_COUNTERS,
     },
   });
+
+  const lpQuery = useJuiceSwapPositions(hash);
+
+  const tokenQuery = useFetchTokens({
+    hash,
+    nativeExchangeRate: addressQuery.data?.exchange_rate,
+  });
+
+  const dataWithLp = useLpEnhancedTokenData(tokenQuery.data, lpQuery.data, addressQuery.data?.exchange_rate);
+  const tokenCount = getTokensTotalInfo(dataWithLp).num;
 
   const countersQuery = useAddressCountersQuery({
     hash,
@@ -249,7 +263,7 @@ const AddressPageContent = () => {
       {
         id: 'tokens',
         title: 'Tokens',
-        count: addressTabsCountersQuery.data?.token_balances_count,
+        count: tokenCount,
         component: <AddressTokens shouldRender={ !isTabsLoading } isQueryEnabled={ areQueriesEnabled }/>,
         subTabs: TOKEN_TABS,
       },
@@ -310,6 +324,7 @@ const AddressPageContent = () => {
     mudTablesCountQuery.data,
     address3rdPartyWidgets,
     addressType,
+    tokenCount,
   ]);
 
   const usernameApiTag = userPropfileApiQuery.data?.user_profile?.username;

@@ -5,6 +5,7 @@ import React from 'react';
 import config from 'configs/app';
 import useApiQuery from 'lib/api/useApiQuery';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { useJuiceSwapPositions } from 'lib/token/useJuiceSwapPositions';
 import { currencyUnits } from 'lib/units';
 import { ZERO } from 'toolkit/utils/consts';
 import DataFetchAlert from 'ui/shared/DataFetchAlert';
@@ -13,6 +14,7 @@ import NativeTokenIcon from 'ui/shared/NativeTokenIcon';
 
 import { getTokensTotalInfo } from '../utils/tokenUtils';
 import useFetchTokens from '../utils/useFetchTokens';
+import { useLpEnhancedTokenData } from '../utils/useLpEnhancedTokenData';
 import TokenBalancesItem from './TokenBalancesItem';
 
 const TokenBalances = () => {
@@ -29,6 +31,8 @@ const TokenBalances = () => {
     hash,
     nativeExchangeRate: addressQuery.data?.exchange_rate,
   });
+  const lpQuery = useJuiceSwapPositions(hash);
+  const dataWithLp = useLpEnhancedTokenData(tokenQuery.data, lpQuery.data, addressQuery.data?.exchange_rate);
 
   if (addressQuery.isError || tokenQuery.isError) {
     return <DataFetchAlert/>;
@@ -43,7 +47,7 @@ const TokenBalances = () => {
     decimals: String(config.chain.currency.decimals),
   });
 
-  const tokensInfo = getTokensTotalInfo(tokenQuery.data);
+  const tokensInfo = getTokensTotalInfo(dataWithLp);
   const prefix = tokensInfo.isOverflow ? '>' : '';
   const totalUsd = nativeUsd.plus(tokensInfo.usd);
   const tokensNumText = tokensInfo.num > 0 ?
