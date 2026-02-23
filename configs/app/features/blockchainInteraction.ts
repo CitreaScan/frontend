@@ -1,10 +1,9 @@
 import type { Feature } from './types';
 
 import chain from '../chain';
-import { getEnvValue } from '../utils';
 import opSuperchain from './opSuperchain';
 
-const walletConnectProjectId = getEnvValue('NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID');
+const walletConnectProjectId = 'c286d68488ed81ccf796a8a0dc8cc2ee';
 
 const title = 'Blockchain interaction (writing to contract, etc.)';
 

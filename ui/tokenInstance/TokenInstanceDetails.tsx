@@ -17,6 +17,7 @@ import NftMedia from 'ui/shared/nft/NftMedia';
 import TokenNftMarketplaces from 'ui/token/TokenNftMarketplaces';
 
 import TokenInstanceCreatorAddress from './details/TokenInstanceCreatorAddress';
+import TokenInstanceLPPosition from './details/TokenInstanceLPPosition';
 import TokenInstanceMetadataInfo from './details/TokenInstanceMetadataInfo';
 import TokenInstanceTransfersCount from './details/TokenInstanceTransfersCount';
 
@@ -105,6 +106,12 @@ const TokenInstanceDetails = ({ data, token, scrollRef, isLoading }: Props) => {
               </DetailedInfo.ItemValue>
             </>
           ) }
+
+          <TokenInstanceLPPosition
+            tokenHash={ token.address_hash }
+            tokenId={ data.id }
+            isLoading={ isLoading }
+          />
         </DetailedInfo.Container>
         <NftMedia
           data={ data }

@@ -45,7 +45,7 @@ const sortErc1155or404Tokens = (sort: Sort) => (dataA: AddressTokenBalance, data
   return Number(dataA.value) > Number(dataB.value) ? 1 : -1;
 };
 
-const sortErc20Tokens = (sort: Sort) => (dataA: TokenEnhancedData, dataB: TokenEnhancedData) => {
+const sortByUsd = (sort: Sort) => (dataA: TokenEnhancedData, dataB: TokenEnhancedData) => {
   if (!dataA.usd && !dataB.usd) {
     return 0;
   }
@@ -55,6 +55,10 @@ const sortErc20Tokens = (sort: Sort) => (dataA: TokenEnhancedData, dataB: TokenE
     return -1;
   }
   if (!dataA.usd) {
+    return 1;
+  }
+
+  if (dataA.usd.eq(dataB.usd)) {
     return 0;
   }
 
@@ -65,11 +69,9 @@ const sortErc20Tokens = (sort: Sort) => (dataA: TokenEnhancedData, dataB: TokenE
   return dataA.usd.gt(dataB.usd) ? 1 : -1;
 };
 
-const sortErc721Tokens = () => () => 0;
-
 export const sortingFns = {
-  'ERC-20': sortErc20Tokens,
-  'ERC-721': sortErc721Tokens,
+  'ERC-20': sortByUsd,
+  'ERC-721': sortByUsd,
   'ERC-1155': sortErc1155or404Tokens,
   'ERC-404': sortErc1155or404Tokens,
 };

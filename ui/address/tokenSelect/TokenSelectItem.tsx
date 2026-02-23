@@ -6,6 +6,7 @@ import { route } from 'nextjs-routes';
 
 import config from 'configs/app';
 import getCurrencyValue from 'lib/getCurrencyValue';
+import { NFT_MANAGER } from 'lib/token/useJuiceSwapPositions';
 import { Link } from 'toolkit/chakra/link';
 import NativeTokenTag from 'ui/shared/celo/NativeTokenTag';
 import TokenEntity from 'ui/shared/entities/token/TokenEntity';
@@ -23,6 +24,8 @@ const TokenSelectItem = ({ data }: Props) => {
 
   const isNativeToken = celoFeature.isEnabled && data.token.address_hash.toLowerCase() === celoFeature.nativeTokenAddress?.toLowerCase();
 
+  const isLpItem = Boolean(data.token_id?.match(/^lp-\d+$/));
+
   const secondRow = (() => {
     switch (data.token.type) {
       case 'ERC-20': {
@@ -37,6 +40,9 @@ const TokenSelectItem = ({ data }: Props) => {
         );
       }
       case 'ERC-721': {
+        if (isLpItem) {
+          return <TruncatedValue value={ data.token.symbol || 'LP Position' }/>;
+        }
         const text = `${ BigNumber(data.value).toFormat() } ${ data.token.symbol || '' }`;
         return <TruncatedValue value={ text }/>;
       }
@@ -74,7 +80,10 @@ const TokenSelectItem = ({ data }: Props) => {
     }
   })();
 
-  const url = route({ pathname: '/token/[hash]', query: { hash: data.token.address_hash } });
+  const lpMatch = data.token_id?.match(/^lp-(\d+)$/);
+  const url = lpMatch ?
+    route({ pathname: '/token/[hash]/instance/[id]', query: { hash: NFT_MANAGER, id: lpMatch[1] } }) :
+    route({ pathname: '/token/[hash]', query: { hash: data.token.address_hash } });
 
   return (
     <Link
