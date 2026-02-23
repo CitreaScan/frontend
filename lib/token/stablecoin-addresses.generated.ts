@@ -79,6 +79,11 @@ export const LP_POOL_PRICE_TOKENS: Record<string, Record<string, { pool: string;
       pool: '0x13e8472d36bbedc99e74b635d74cc6d68508d0f5',
       quoteTokenIndex: 0,
     },
+    // Citrus Season (CSS) - graduated, JuiceSwap V2 pool with JUSD as quote token (token0)
+    '0x7af2d446049a41df9cd9632a3ce5e6a9d97330a7': {
+      pool: '0x9e7f9f87246fe624de709072b1783db666460c2e',
+      quoteTokenIndex: 0,
+    },
   },
 };
 
@@ -91,7 +96,5 @@ export const BONDING_CURVE_TOKENS: Record<string, ReadonlyArray<string>> = {
   '4114': [
     // THERESIA - active bonding curve
     '0x1a5d37d3b9783cfeb0b91768f16fa1cfebf4d0bc',
-    // Citrus Season (CSS)
-    '0x7AF2D446049A41DF9cd9632A3cE5E6A9d97330A7',
   ],
 };
