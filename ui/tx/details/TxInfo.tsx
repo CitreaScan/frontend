@@ -105,19 +105,48 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
     },
   });
 
+  const needsInternalTxsFetch = Boolean(
+    data?.hash && (
+      // Existing condition: API provides internal_value_flow
+      (data?.internal_value_flow &&
+        (data.internal_value_flow.in !== '0' || data.internal_value_flow.out !== '0') &&
+        [ 'claim', 'claimbatch', 'refund', 'lock', 'deposit' ].includes((data?.method ?? '').toLowerCase())) ||
+      // New condition: detect native transfers from internal txs
+      (data?.value === '0' && !data?.internal_value_flow && data?.to?.is_contract && data?.status === 'ok')
+    ),
+  );
+
   const internalTxsQuery = useApiQuery('general:tx_internal_txs', {
     pathParams: { hash: data?.hash ?? '' },
     queryOptions: {
-      enabled: Boolean(
-        data?.hash &&
-        data?.internal_value_flow &&
-        (data.internal_value_flow.in !== '0' || data.internal_value_flow.out !== '0') &&
-        [ 'claim', 'claimbatch', 'refund', 'lock', 'deposit' ].includes((data?.method ?? '').toLowerCase()),
-      ),
+      enabled: needsInternalTxsFetch,
     },
   });
 
   const internalTransfer = getInternalTransfer(internalTxsQuery.data?.items);
+
+  const computedTransfer = React.useMemo(() => {
+    if (data?.internal_value_flow) return null;
+    const items = internalTxsQuery.data?.items;
+    if (!items) return null;
+
+    const callsWithValue = items.filter(
+      (tx) => tx.type === 'call' && tx.value !== '0' && tx.success,
+    );
+    if (callsWithValue.length === 0) return null;
+
+    const totalValue = callsWithValue.reduce(
+      (sum, tx) => sum.plus(tx.value), BigNumber(0),
+    ).toString();
+
+    // Use the last call with value as the primary transfer (typically the final recipient)
+    const primary = callsWithValue[callsWithValue.length - 1];
+    return {
+      value: totalValue,
+      from: primary.from,
+      to: primary.to ?? primary.created_contract,
+    };
+  }, [ data?.internal_value_flow, internalTxsQuery.data?.items ]);
 
   const handleCutLinkClick = React.useCallback(() => {
     setIsExpanded((flag) => !flag);
@@ -134,7 +163,9 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
   const flow = data.internal_value_flow;
   const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
   const needInternalTransfer = hasInternalValueFlow && [ 'claim', 'claimbatch', 'refund', 'lock', 'deposit' ].includes((data.method ?? '').toLowerCase());
-  const totalValue = hasInternalValueFlow ? BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() : data.value;
+  const totalValue = hasInternalValueFlow ?
+    BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() :
+    (computedTransfer?.value ?? data.value);
 
   const addressFromTags = [
     ...data.from.private_tags || [],
@@ -683,6 +714,25 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
       { hasInternalValueFlow && data.internal_value_flow && (!needInternalTransfer || !internalTxsQuery.isLoading) ? (
         <TxTransferRow data={ data } isLoading={ isLoading } internalTransfer={ internalTransfer }/>
       ) : null }
+
+      { computedTransfer && !needInternalTransfer && (
+        <>
+          <DetailedInfo.ItemLabel
+            hint="Native coin transfer via internal transaction"
+            isLoading={ isLoading }
+          >
+            Transfer
+          </DetailedInfo.ItemLabel>
+          <DetailedInfo.ItemValue>
+            <Flex alignItems="center" flexWrap="wrap" gap={ 2 }>
+              <span>from</span>
+              <AddressEntity address={ computedTransfer.from } isLoading={ isLoading } noIcon/>
+              <span>to</span>
+              { computedTransfer.to && <AddressEntity address={ computedTransfer.to } isLoading={ isLoading } noIcon/> }
+            </Flex>
+          </DetailedInfo.ItemValue>
+        </>
+      ) }
 
       <TxDetailsTxFee isLoading={ isLoading } data={ data }/>
 
