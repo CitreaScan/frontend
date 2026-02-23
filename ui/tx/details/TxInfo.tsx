@@ -163,6 +163,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
   const flow = data.internal_value_flow;
   const hasInternalValueFlow = Boolean(flow && !(flow.in === '0' && flow.out === '0'));
   const needInternalTransfer = hasInternalValueFlow && [ 'claim', 'claimbatch', 'refund', 'lock', 'deposit' ].includes((data.method ?? '').toLowerCase());
+  const isComputingInternalValue = needsInternalTxsFetch && !data.internal_value_flow && internalTxsQuery.isLoading;
   const totalValue = hasInternalValueFlow ?
     BigNumber(flow!.in).minus(BigNumber(flow!.out)).abs().toString() :
     (computedTransfer?.value ?? data.value);
@@ -698,7 +699,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
               value={ totalValue }
               currency={ currencyUnits.ether }
               exchangeRate={ data.exchange_rate }
-              isLoading={ isLoading }
+              isLoading={ isLoading || isComputingInternalValue }
               flexWrap="wrap"
               mr={ hasInternalValueFlow ? 3 : 0 }
               rowGap={ 0 }
@@ -715,7 +716,7 @@ const TxInfo = ({ data, tacOperations, isLoading, socketStatus }: Props) => {
         <TxTransferRow data={ data } isLoading={ isLoading } internalTransfer={ internalTransfer }/>
       ) : null }
 
-      { computedTransfer && !needInternalTransfer && (
+      { computedTransfer && !needInternalTransfer && !isComputingInternalValue && (
         <>
           <DetailedInfo.ItemLabel
             hint="Native coin transfer via internal transaction"
