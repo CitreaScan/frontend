@@ -79,6 +79,11 @@ export const LP_POOL_PRICE_TOKENS: Record<string, Record<string, { pool: string;
       pool: '0x13e8472d36bbedc99e74b635d74cc6d68508d0f5',
       quoteTokenIndex: 0,
     },
+    // Citrus Season (CSS) - graduated, JuiceSwap V2 pool with JUSD as quote token (token0)
+    '0x7af2d446049a41df9cd9632a3ce5e6a9d97330a7': {
+      pool: '0x9e7f9f87246fe624de709072b1783db666460c2e',
+      quoteTokenIndex: 0,
+    },
   },
 };
 
