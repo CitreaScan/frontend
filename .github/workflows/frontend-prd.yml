@@ -46,11 +46,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.DFXPRD_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh -i ~/.ssh/deploy_key \
-            -o StrictHostKeyChecking=no \
-            -o ProxyCommand="cloudflared access ssh --hostname %h" \
-            dfxprd@ssh-dfxprd.dfxserve.com \
-            "export PATH=/usr/local/bin:\$PATH && \
-             cd ~/citreascan && docker compose pull frontend && docker compose up -d frontend && \
-             cd ~/citreascan-mainnet && docker compose pull frontend && docker compose up -d frontend"
+          SSH_CMD="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ProxyCommand=\"cloudflared access ssh --hostname %h\" dfxprd@ssh-dfxprd.dfxserve.com"
+          eval $SSH_CMD cs-testnet-frontend
+          eval $SSH_CMD cs-mainnet-frontend
           rm ~/.ssh/deploy_key
