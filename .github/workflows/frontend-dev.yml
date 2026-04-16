@@ -7,18 +7,11 @@ on:
 
 env:
   DOCKER_TAGS: dfxswiss/citrea-frontend:beta
-  AZURE_RESOURCE_GROUP: rg-dfx-api-dev
-  AZURE_VM_NAME: vm-dfx-node-dev
-  AZURE_FRONT_DOOR: 'afd-dfx-api-dev'
-  AZURE_FRONT_DOOR_ENDPOINT: 'fde-dfx-ctef-dev'
 
 jobs:
   build-and-deploy:
-    name: Build, test and deploy to DEV
+    name: Build and deploy to DEV
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,6 +22,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -38,43 +34,19 @@ jobs:
           context: .
           push: true
           tags: ${{ env.DOCKER_TAGS }}
+          platforms: linux/arm64
 
-      - name: Log in to Azure
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.DFX_DEV_CREDENTIALS }}
-        
-      - name: Update Azure VM docker container
-        uses: azure/CLI@v2
-        with:
-          inlineScript: |
-            echo "Update docker container..."
-
-            CONTENT_DEV=$(base64 -w0 ./.env.dev)
-            CONTENT_PRD=$(base64 -w0 ./.env.prd)
-
-            az vm run-command invoke \
-              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-              --name ${{ env.AZURE_VM_NAME }} \
-              --command-id RunShellScript \
-              --scripts "
-                echo $CONTENT_DEV | base64 -d > /home/dfx/docker-compose-blockscout-citrea-testnet.frontend.env &&
-                echo $CONTENT_PRD | base64 -d > /home/dfx/docker-compose-blockscout-citrea-mainnet.frontend.env &&
-                /home/dfx/update-blockscout.sh frontend
-              "
-
-      - name: Purge Frontdoor endpoint
-        uses: azure/CLI@v2
-        with:
-          inlineScript: |
-            az afd endpoint purge \
-              --content-paths "/*" \
-              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-              --profile-name ${{ env.AZURE_FRONT_DOOR }} \
-              --endpoint-name ${{ env.AZURE_FRONT_DOOR_ENDPOINT }} \
-              --no-wait
-
-      - name: Logout from Azure
+      - name: Install cloudflared
         run: |
-          az logout
-        if: always()
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
+
+      - name: Deploy to dfxdev
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DFXDEV_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          SSH_CMD="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ProxyCommand=\"cloudflared access ssh --hostname %h\" dfxdev@ssh-dfxdev.dfxserve.com"
+          eval $SSH_CMD cs-testnet-frontend
+          eval $SSH_CMD cs-mainnet-frontend
+          rm ~/.ssh/deploy_key
