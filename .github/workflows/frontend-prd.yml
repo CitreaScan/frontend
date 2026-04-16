@@ -11,7 +11,7 @@ env:
 jobs:
   build-and-deploy:
     name: Build and deploy to PRD
-    runs-on: [self-hosted, dfxprd]
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,7 +33,21 @@ jobs:
           tags: ${{ env.DOCKER_TAGS }}
           platforms: linux/arm64
 
-      - name: Deploy stacks
+      - name: Install cloudflared
         run: |
-          cs-testnet-frontend
-          cs-mainnet-frontend
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/download/2025.4.0/cloudflared-linux-arm64 -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
+
+      - name: Deploy to server
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DFXPRD_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            -o ProxyCommand="cloudflared access ssh --hostname ${{ secrets.DEPLOY_PRD_HOST }}" \
+            ${{ secrets.DEPLOY_PRD_USER }}@${{ secrets.DEPLOY_PRD_HOST }} \
+            cs-testnet-frontend
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            -o ProxyCommand="cloudflared access ssh --hostname ${{ secrets.DEPLOY_PRD_HOST }}" \
+            ${{ secrets.DEPLOY_PRD_USER }}@${{ secrets.DEPLOY_PRD_HOST }} \
+            cs-mainnet-frontend
