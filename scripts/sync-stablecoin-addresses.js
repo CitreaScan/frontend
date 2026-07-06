@@ -19,7 +19,7 @@ const OUTPUT_FILE = path.join(__dirname, '../lib/token/stablecoin-addresses.gene
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 // Only extract addresses for Citrea chains
-const SUPPORTED_CHAIN_IDS = [ '4114', '5115' ]; // Citrea Mainnet, Citrea Testnet
+const SUPPORTED_CHAIN_IDS = [ '4114' ]; // Citrea Mainnet
 
 // Stablecoin token keys to extract
 const STABLECOIN_KEYS = [ 'juiceDollar', 'startUSD', 'USDC', 'USDT', 'CTUSD' ];
@@ -30,7 +30,6 @@ const BTC_PEGGED_ADDRESSES = {
   '4114': [
     '0x384157027b1cdeac4e26e3709667bb28735379bb', // syBTC (Symbiosis)
   ],
-  '5115': [],
 };
 
 // Additional stablecoin addresses (hardcoded, not from packages)
@@ -39,7 +38,6 @@ const ADDITIONAL_STABLECOIN_ADDRESSES = {
   '4114': [
     '0x0987d3720d38847ac6dbb9d025b9de892a3ca35c', // JUSD (Juice Dollar)
   ],
-  '5115': [],
 };
 
 // Vault token keys to extract (ERC-4626 vaults with stablecoin underlying)

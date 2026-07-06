@@ -14,10 +14,6 @@ export const STABLECOIN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
     '0x8d82c4e3c936c7b5724a382a9c5a4e6eb7ab6d5d',
     '0x0987d3720d38847ac6dbb9d025b9de892a3ca35c',
   ],
-  '5115': [
-    '0x6a850a548fdd050e8961223ec8ffcdfacea57e39',
-    '0x8398da4c32eae51b9840da230095bb29f4179590',
-  ],
 };
 
 /**
@@ -26,7 +22,6 @@ export const STABLECOIN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
  */
 export const WRAPPED_NATIVE_ADDRESSES: Record<string, string> = {
   '4114': '0x3100000000000000000000000000000000000006',
-  '5115': '0x8d0c9d1c17ae5e40fff9be350f57840e9e66cd93',
 };
 
 /**
@@ -38,9 +33,6 @@ export const VAULT_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
   '4114': [
     '0x1b70ae756b1089cc5948e4f8a2ad498df30e897d',
   ],
-  '5115': [
-    '0x802a29bd29f02c8c477af5362f9ba88fae39cc7b',
-  ],
 };
 
 /**
@@ -50,9 +42,6 @@ export const VAULT_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
 export const EQUITY_TOKEN_ADDRESSES: Record<string, ReadonlyArray<string>> = {
   '4114': [
     '0x2a36f2b204b46fd82653cd06d00c7ff757c99ae4',
-  ],
-  '5115': [
-    '0x7fa131991c8a7d8c21b11391c977fc7c4c8e0d5e',
   ],
 };
 

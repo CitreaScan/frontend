@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import config from 'configs/app';
 
 // Supported chain IDs for launchpad
-const SUPPORTED_CHAIN_IDS = [ '4114', '5115' ];
+const SUPPORTED_CHAIN_IDS = [ '4114' ];
 
 interface LaunchpadTokenData {
   imageUrl: string | null;

@@ -3,13 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 // JuiceSwap Ponder API URLs by chain ID
 const PONDER_API_URLS: Record<string, string> = {
   '4114': 'https://ponder.juiceswap.com',
-  '5115': 'https://dev.ponder.juiceswap.com',
 };
 
 // JuiceSwap Launchpad URLs by chain ID
 const LAUNCHPAD_URLS: Record<string, string> = {
   '4114': 'https://bapp.juiceswap.com/launchpad',
-  '5115': 'https://dev.bapp.juiceswap.com/launchpad',
 };
 
 interface LaunchpadTokenResponse {
